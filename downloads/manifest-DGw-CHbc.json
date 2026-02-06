@@ -1,0 +1,23 @@
+{
+  "short_name": "LinkWise",
+  "name": "LinkWise AI",
+  "description": "Gestor de enlaces inteligente con resúmenes y análisis SEO por IA.",
+  "icons": [
+    {
+      "src": "images/icon-192x192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/icon-512x512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1a1a1a",
+  "background_color": "#121212"
+}
