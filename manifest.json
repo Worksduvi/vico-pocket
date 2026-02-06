@@ -1,0 +1,24 @@
+{
+  "name": "VICO Pocket",
+  "short_name": "VPocket",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#3b82f6",
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2589/2589174.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

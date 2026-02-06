@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VICO Pocket</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #0f172a; color: white; font-family: sans-serif; }
+        .card { background: #1e293b; border-radius: 12px; padding: 15px; margin-bottom: 10px; border-left: 4px solid #3b82f6; }
+    </style>
+</head>
+<body class="p-5">
+    <header class="flex justify-between items-center mb-8">
+        <h1 class="text-2xl font-black text-blue-400 italic">VICO POCKET</h1>
+        <button onclick="exportLinks()" class="bg-slate-700 p-2 rounded text-xs">Exportar JSON</button>
+    </header>
+
+    <div id="save-area" class="mb-10 bg-blue-900/20 p-4 rounded-xl border border-blue-500/30 hidden">
+        <h2 class="text-sm font-bold text-blue-300 mb-2">📥 Nuevo Link Recibido</h2>
+        <input id="new-title" class="w-full bg-slate-800 p-2 rounded mb-2 text-sm">
+        <input id="new-url" class="w-full bg-slate-800 p-2 rounded mb-4 text-xs text-gray-400">
+        <button onclick="saveLink()" class="w-full bg-blue-600 py-2 rounded font-bold">GUARDAR AHORA</button>
+    </div>
+
+    <div id="links-list">
+        </div>
+
+    <script>
+        // Lógica para recibir links vía Web Share Target
+        window.addEventListener('DOMContentLoaded', () => {
+            const parsedUrl = new URL(window.location);
+            const title = parsedUrl.searchParams.get('title');
+            const text = parsedUrl.searchParams.get('text');
+            const url = parsedUrl.searchParams.get('url');
+
+            if (title || url) {
+                document.getElementById('save-area').classList.remove('hidden');
+                document.getElementById('new-title').value = title || text || "Sin título";
+                document.getElementById('new-url').value = url || "";
+            }
+            renderLinks();
+        });
+
+        function saveLink() {
+            const links = JSON.parse(localStorage.getItem('vico_pocket') || '[]');
+            links.unshift({
+                title: document.getElementById('new-title').value,
+                url: document.getElementById('new-url').value,
+                date: new Date().toLocaleDateString()
+            });
+            localStorage.setItem('vico_pocket', JSON.stringify(links));
+            location.href = window.location.pathname; // Limpia la URL
+        }
+
+        function renderLinks() {
+            const links = JSON.parse(localStorage.getItem('vico_pocket') || '[]');
+            const container = document.getElementById('links-list');
+            container.innerHTML = links.map((l, i) => `
+                <div class="card">
+                    <h3 class="font-bold text-sm">${l.title}</h3>
+                    <p class="text-[10px] text-gray-500 mb-2">${l.date}</p>
+                    <a href="${l.url}" target="_blank" class="text-blue-400 text-xs truncate block">${l.url}</a>
+                    <button onclick="deleteLink(${i})" class="text-red-500 text-[10px] mt-2 italic">Eliminar</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteLink(i) {
+            const links = JSON.parse(localStorage.getItem('vico_pocket') || '[]');
+            links.splice(i, 1);
+            localStorage.setItem('vico_pocket', JSON.stringify(links));
+            renderLinks();
+        }
+    </script>
+</body>
+</html>
