@@ -2,7 +2,7 @@
   "name": "VICO POCKET ELITE",
   "short_name": "VicoPocket",
   "description": "Tu centro de productividad impulsado por Gemini AI",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#0b0f1a",
   "theme_color": "#3b82f6",
@@ -13,14 +13,5 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ],
-  "share_target": {
-    "action": "/",
-    "method": "GET",
-    "params": {
-      "title": "title",
-      "text": "text",
-      "url": "url"
-    }
-  }
+  ]
 }
