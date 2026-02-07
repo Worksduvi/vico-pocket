@@ -1,130 +1,121 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <link rel="icon" type="image/png" href="icon.png">
-<link rel="apple-touch-icon" href="icon.png">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VICO POCKET ELITE</title>
     <link rel="manifest" href="manifest.json">
-
-<script>
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js');
-    }
-</script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root { --vico-bg: #0b0f1a; --vico-accent: #3b82f6; }
-        body { background: var(--vico-bg); color: #e2e8f0; transition: 0.5s; font-family: 'Inter', sans-serif; }
-        .glass-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 1rem; }
-        .gold-grad { background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728); -webkit-background-clip: text; color: transparent; }
+        :root { --bg: #0b0f1a; --accent: #3b82f6; --card: rgba(255,255,255,0.03); }
+        body { background: var(--bg); color: #e2e8f0; font-family: 'Inter', sans-serif; transition: 0.5s; }
+        .active-tab { color: #3b82f6; border-bottom: 2px solid #3b82f6; opacity: 1 !important; }
+        .gold-theme { --bg: #1a1605; --accent: #ffd700; background: linear-gradient(135deg, #1a1605, #2c2401); }
     </style>
 </head>
 <body class="p-4 pb-32">
 
-    <header class="flex justify-between items-start mb-8">
+    <header class="flex justify-between items-center mb-8">
         <div>
-            <h1 class="text-2xl font-black italic tracking-tighter text-blue-500">VICO POCKET <span class="text-[10px] bg-blue-600/20 py-1 px-2 rounded border border-blue-500/30">ELITE</span></h1>
-            <p class="text-[9px] mt-1 opacity-70 flex items-center gap-1">
-                <i class="fa-solid fa-microchip text-blue-400"></i> Powered by Google Gemini AI
-            </p>
+            <h1 class="text-2xl font-black italic text-blue-500">VICO POCKET <span class="text-[10px] border border-blue-500 px-1 rounded">ELITE</span></h1>
+            <p class="text-[9px] opacity-70"><i class="fa-solid fa-microchip"></i> Powered by Gemini AI</p>
         </div>
-        <button onclick="toggleSettings()" class="glass-card p-3 hover:bg-white/10 transition"><i class="fa-solid fa-sliders"></i></button>
+        <button onclick="openProfile()" class="bg-white/5 p-3 rounded-xl border border-white/10"><i class="fa-solid fa-user-gear"></i></button>
     </header>
 
-    <div class="flex gap-4 mb-6 text-sm font-bold border-b border-white/10 pb-2">
-        <button onclick="switchTab('links')" id="tab-links" class="text-blue-500 border-b-2 border-blue-500 pb-2">Links</button>
-        <button onclick="switchTab('notes')" id="tab-notes" class="opacity-50 pb-2">Notes</button>
-        <button onclick="switchTab('rss')" id="tab-rss" class="opacity-50 pb-2 text-orange-400">RSS Feed</button>
-    </div>
-
-    <main id="main-content">
-        </main>
-
-    <footer class="mt-12 py-6 border-t border-white/5 text-center">
-        <p class="text-[10px] opacity-60">
-            © 2026 VICO POCKET App. Todos los derechos reservados.
-        </p>
-        <p class="text-[11px] mt-2">
-            Creado por 
-            <a href="https://www.linkedin.com/in/jaime-andrés-dueñas-vicuña" target="_blank" class="font-bold text-blue-400 hover:text-blue-300 inline-flex items-center gap-1">
-                Jaime Andrés Dueñas Vicuña <i class="fa-brands fa-linkedin text-sm"></i>
-            </a>
-        </p>
-    </footer>
-
-    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] glass-card p-2 flex justify-around items-center shadow-2xl border-white/20">
-        <button onclick="switchTab('links')" class="p-2"><i class="fa-solid fa-link"></i></button>
-        <button onclick="switchTab('notes')" class="p-2"><i class="fa-solid fa-note-sticky"></i></button>
-        <button onclick="window.open('https://paypal.me/proyectosduvi', '_blank')" class="bg-yellow-500 text-black px-4 py-2 rounded-lg font-bold text-xs shadow-lg flex items-center gap-2">
-            <i class="fa-brands fa-paypal"></i> <span data-lang="donate">Donar</span>
-        </button>
+    <nav class="flex gap-6 mb-6 text-sm font-bold border-b border-white/5">
+        <button onclick="switchTab('links')" id="btn-links" class="active-tab pb-2">Links</button>
+        <button onclick="switchTab('notes')" id="btn-notes" class="opacity-40 pb-2">Notes</button>
+        <button onclick="switchTab('rss')" id="btn-rss" class="opacity-40 pb-2">RSS Feed</button>
     </nav>
 
-    <div id="settings-modal" class="fixed inset-0 bg-[#0b0f1a]/fb z-50 p-8 hidden overflow-y-auto">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-xl font-bold uppercase tracking-widest text-blue-500" data-lang="settings">Configuración</h2>
-            <button onclick="toggleSettings()" class="text-2xl">&times;</button>
-        </div>
-
-        <section class="space-y-6">
-            <div>
-                <label class="block text-xs uppercase opacity-50 mb-2">Language / Idioma</label>
-                <select id="lang-select" onchange="changeLanguage()" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl">
-                    <option value="es">Español</option>
-                    <option value="en">English</option>
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-xs uppercase opacity-50 mb-2">RSS Feed URL</label>
-                <input type="text" id="rss-input" placeholder="https://news.google.com/rss..." class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-sm">
-                <button onclick="saveRSS()" class="mt-2 w-full bg-orange-600/20 text-orange-400 border border-orange-600/30 py-2 rounded-xl text-xs font-bold">Añadir RSS</button>
-            </div>
-
-            <div>
-                <label class="block text-xs uppercase opacity-50 mb-2">Gemini API Key</label>
-                <input type="password" id="api-key" placeholder="AI Studio Key..." class="w-full bg-white/5 border border-white/10 p-3 rounded-xl">
-            </div>
+    <main id="view-container">
+        <section id="view-links" class="space-y-4">
+            <div id="links-list" class="text-center opacity-50 py-10 text-xs italic">No hay enlaces guardados.</div>
         </section>
+
+        <section id="view-notes" class="hidden space-y-4">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xs uppercase opacity-50">Carpetas</h3>
+                <button onclick="addFolder()" class="text-blue-500 text-xs">+ Nueva</button>
+            </div>
+            <div id="folder-list" class="flex gap-2 overflow-x-auto pb-2"></div>
+            <div id="notes-grid" class="grid grid-cols-2 gap-3"></div>
+            <button onclick="addNote()" class="w-full bg-blue-600/20 border border-blue-500/30 py-3 rounded-xl text-xs font-bold">+ Crear Nota</button>
+        </section>
+
+        <section id="view-rss" class="hidden space-y-4">
+            <div id="rss-feed" class="space-y-3"></div>
+        </section>
+    </main>
+
+    <div id="profile-modal" class="fixed inset-0 bg-[#0b0f1a] z-50 p-8 hidden overflow-y-auto">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-xl font-bold italic">PERFIL & AJUSTES</h2>
+            <button onclick="closeProfile()" class="text-2xl">&times;</button>
+        </div>
+        
+        <div class="space-y-8">
+            <div>
+                <label class="text-[10px] uppercase opacity-40">Personalización de Temas</label>
+                <div class="grid grid-cols-3 gap-2 mt-2">
+                    <button onclick="applyTheme('default')" class="bg-slate-800 py-2 rounded text-[10px]">OLED</button>
+                    <button onclick="applyTheme('gold')" class="bg-yellow-600 py-2 rounded text-[10px] text-black font-bold">GOLD</button>
+                    <button onclick="applyTheme('cyber')" class="bg-purple-600 py-2 rounded text-[10px]">CYBER</button>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center bg-white/5 p-4 rounded-xl">
+                <span class="text-sm">Sonidos UX Suaves</span>
+                <input type="checkbox" id="sound-pref" class="w-5 h-5">
+            </div>
+
+            <div>
+                <label class="text-[10px] uppercase opacity-40">IA Gemini API Key</label>
+                <input type="password" id="gemini-key" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl mt-2 text-xs">
+            </div>
+        </div>
     </div>
 
+    <footer class="mt-20 py-10 border-t border-white/5 text-center text-[10px] opacity-40">
+        <p>© 2026 VICO POCKET App. Todos los derechos reservados.</p>
+        <p class="mt-2 text-blue-400 font-bold">Creado por Jaime Andrés Dueñas Vicuña <a href="https://www.linkedin.com/in/jaime-andrés-dueñas-vicuña"><i class="fa-brands fa-linkedin"></i></a></p>
+    </footer>
+
     <script>
-        const translations = {
-            es: { donate: "Donar", settings: "Configuración", share: "Compartir", save: "Guardar" },
-            en: { donate: "Donate", settings: "Settings", share: "Share", save: "Save" }
-        };
-
-        function changeLanguage() {
-            const lang = document.getElementById('lang-select').value;
-            document.querySelectorAll('[data-lang]').forEach(el => {
-                el.textContent = translations[lang][el.getAttribute('data-lang')];
-            });
-            localStorage.setItem('vico_lang', lang);
-        }
-
-        function shareContent(title, text, url) {
-            if (navigator.share) {
-                navigator.share({ title, text, url });
-            } else {
-                alert("Enlace copiado: " + url);
+        // Sistema de captura de enlaces compartidos (Incoming Share)
+        window.addEventListener('DOMContentLoaded', () => {
+            const parsedUrl = new URL(window.location);
+            const title = parsedUrl.searchParams.get('title');
+            const url = parsedUrl.searchParams.get('url');
+            if (title && url) {
+                saveLink(title, url);
             }
+        });
+
+        function switchTab(tab) {
+            ['links', 'notes', 'rss'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+                document.getElementById(`btn-${t}`).classList.remove('active-tab');
+                document.getElementById(`btn-${t}`).classList.add('opacity-40');
+            });
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            document.getElementById(`btn-${tab}`).classList.add('active-tab');
+            document.getElementById(`btn-${tab}`).classList.remove('opacity-40');
         }
 
-        // --- Lógica RSS ---
-        function saveRSS() {
-            const url = document.getElementById('rss-input').value;
-            localStorage.setItem('vico_rss_url', url);
-            alert("RSS Guardado. Reiniciando feed...");
-            renderRSS();
+        function openProfile() { document.getElementById('profile-modal').classList.remove('hidden'); }
+        function closeProfile() { document.getElementById('profile-modal').classList.add('hidden'); }
+        
+        function applyTheme(theme) {
+            document.body.className = `p-4 pb-32 ${theme}-theme`;
+            localStorage.setItem('vico_theme', theme);
         }
 
-        function toggleSettings() {
-            document.getElementById('settings-modal').classList.toggle('hidden');
+        // Registrar Service Worker para que Android detecte la App
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
         }
     </script>
 </body>
