@@ -3,75 +3,117 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICO Pocket</title>
-    <link rel="manifest" href="manifest.json">
+    <title>VICO POCKET ELITE</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; }
-        .card { background: #1e293b; border-radius: 12px; padding: 15px; margin-bottom: 10px; border-left: 4px solid #3b82f6; }
+        :root { --vico-bg: #0b0f1a; --vico-accent: #3b82f6; }
+        body { background: var(--vico-bg); color: #e2e8f0; transition: 0.5s; font-family: 'Inter', sans-serif; }
+        .glass-card { background: rgba(255,255,255,0.03); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 1rem; }
+        .gold-grad { background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728); -webkit-background-clip: text; color: transparent; }
     </style>
 </head>
-<body class="p-5">
-    <header class="flex justify-between items-center mb-8">
-        <h1 class="text-2xl font-black text-blue-400 italic">VICO POCKET</h1>
-        <button onclick="exportLinks()" class="bg-slate-700 p-2 rounded text-xs">Exportar JSON</button>
+<body class="p-4 pb-32">
+
+    <header class="flex justify-between items-start mb-8">
+        <div>
+            <h1 class="text-2xl font-black italic tracking-tighter text-blue-500">VICO POCKET <span class="text-[10px] bg-blue-600/20 py-1 px-2 rounded border border-blue-500/30">ELITE</span></h1>
+            <p class="text-[9px] mt-1 opacity-70 flex items-center gap-1">
+                <i class="fa-solid fa-microchip text-blue-400"></i> Powered by Google Gemini AI
+            </p>
+        </div>
+        <button onclick="toggleSettings()" class="glass-card p-3 hover:bg-white/10 transition"><i class="fa-solid fa-sliders"></i></button>
     </header>
 
-    <div id="save-area" class="mb-10 bg-blue-900/20 p-4 rounded-xl border border-blue-500/30 hidden">
-        <h2 class="text-sm font-bold text-blue-300 mb-2">📥 Nuevo Link Recibido</h2>
-        <input id="new-title" class="w-full bg-slate-800 p-2 rounded mb-2 text-sm">
-        <input id="new-url" class="w-full bg-slate-800 p-2 rounded mb-4 text-xs text-gray-400">
-        <button onclick="saveLink()" class="w-full bg-blue-600 py-2 rounded font-bold">GUARDAR AHORA</button>
+    <div class="flex gap-4 mb-6 text-sm font-bold border-b border-white/10 pb-2">
+        <button onclick="switchTab('links')" id="tab-links" class="text-blue-500 border-b-2 border-blue-500 pb-2">Links</button>
+        <button onclick="switchTab('notes')" id="tab-notes" class="opacity-50 pb-2">Notes</button>
+        <button onclick="switchTab('rss')" id="tab-rss" class="opacity-50 pb-2 text-orange-400">RSS Feed</button>
     </div>
 
-    <div id="links-list">
+    <main id="main-content">
+        </main>
+
+    <footer class="mt-12 py-6 border-t border-white/5 text-center">
+        <p class="text-[10px] opacity-60">
+            © 2026 VICO POCKET App. Todos los derechos reservados.
+        </p>
+        <p class="text-[11px] mt-2">
+            Creado por 
+            <a href="https://www.linkedin.com/in/jaime-andrés-dueñas-vicuña" target="_blank" class="font-bold text-blue-400 hover:text-blue-300 inline-flex items-center gap-1">
+                Jaime Andrés Dueñas Vicuña <i class="fa-brands fa-linkedin text-sm"></i>
+            </a>
+        </p>
+    </footer>
+
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] glass-card p-2 flex justify-around items-center shadow-2xl border-white/20">
+        <button onclick="switchTab('links')" class="p-2"><i class="fa-solid fa-link"></i></button>
+        <button onclick="switchTab('notes')" class="p-2"><i class="fa-solid fa-note-sticky"></i></button>
+        <button onclick="window.open('https://paypal.me/proyectosduvi', '_blank')" class="bg-yellow-500 text-black px-4 py-2 rounded-lg font-bold text-xs shadow-lg flex items-center gap-2">
+            <i class="fa-brands fa-paypal"></i> <span data-lang="donate">Donar</span>
+        </button>
+    </nav>
+
+    <div id="settings-modal" class="fixed inset-0 bg-[#0b0f1a]/fb z-50 p-8 hidden overflow-y-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-xl font-bold uppercase tracking-widest text-blue-500" data-lang="settings">Configuración</h2>
+            <button onclick="toggleSettings()" class="text-2xl">&times;</button>
         </div>
 
+        <section class="space-y-6">
+            <div>
+                <label class="block text-xs uppercase opacity-50 mb-2">Language / Idioma</label>
+                <select id="lang-select" onchange="changeLanguage()" class="w-full bg-white/5 border border-white/10 p-3 rounded-xl">
+                    <option value="es">Español</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs uppercase opacity-50 mb-2">RSS Feed URL</label>
+                <input type="text" id="rss-input" placeholder="https://news.google.com/rss..." class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-sm">
+                <button onclick="saveRSS()" class="mt-2 w-full bg-orange-600/20 text-orange-400 border border-orange-600/30 py-2 rounded-xl text-xs font-bold">Añadir RSS</button>
+            </div>
+
+            <div>
+                <label class="block text-xs uppercase opacity-50 mb-2">Gemini API Key</label>
+                <input type="password" id="api-key" placeholder="AI Studio Key..." class="w-full bg-white/5 border border-white/10 p-3 rounded-xl">
+            </div>
+        </section>
+    </div>
+
     <script>
-        // Lógica para recibir links vía Web Share Target
-        window.addEventListener('DOMContentLoaded', () => {
-            const parsedUrl = new URL(window.location);
-            const title = parsedUrl.searchParams.get('title');
-            const text = parsedUrl.searchParams.get('text');
-            const url = parsedUrl.searchParams.get('url');
+        const translations = {
+            es: { donate: "Donar", settings: "Configuración", share: "Compartir", save: "Guardar" },
+            en: { donate: "Donate", settings: "Settings", share: "Share", save: "Save" }
+        };
 
-            if (title || url) {
-                document.getElementById('save-area').classList.remove('hidden');
-                document.getElementById('new-title').value = title || text || "Sin título";
-                document.getElementById('new-url').value = url || "";
-            }
-            renderLinks();
-        });
-
-        function saveLink() {
-            const links = JSON.parse(localStorage.getItem('vico_pocket') || '[]');
-            links.unshift({
-                title: document.getElementById('new-title').value,
-                url: document.getElementById('new-url').value,
-                date: new Date().toLocaleDateString()
+        function changeLanguage() {
+            const lang = document.getElementById('lang-select').value;
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                el.textContent = translations[lang][el.getAttribute('data-lang')];
             });
-            localStorage.setItem('vico_pocket', JSON.stringify(links));
-            location.href = window.location.pathname; // Limpia la URL
+            localStorage.setItem('vico_lang', lang);
         }
 
-        function renderLinks() {
-            const links = JSON.parse(localStorage.getItem('vico_pocket') || '[]');
-            const container = document.getElementById('links-list');
-            container.innerHTML = links.map((l, i) => `
-                <div class="card">
-                    <h3 class="font-bold text-sm">${l.title}</h3>
-                    <p class="text-[10px] text-gray-500 mb-2">${l.date}</p>
-                    <a href="${l.url}" target="_blank" class="text-blue-400 text-xs truncate block">${l.url}</a>
-                    <button onclick="deleteLink(${i})" class="text-red-500 text-[10px] mt-2 italic">Eliminar</button>
-                </div>
-            `).join('');
+        function shareContent(title, text, url) {
+            if (navigator.share) {
+                navigator.share({ title, text, url });
+            } else {
+                alert("Enlace copiado: " + url);
+            }
         }
 
-        function deleteLink(i) {
-            const links = JSON.parse(localStorage.getItem('vico_pocket') || '[]');
-            links.splice(i, 1);
-            localStorage.setItem('vico_pocket', JSON.stringify(links));
-            renderLinks();
+        // --- Lógica RSS ---
+        function saveRSS() {
+            const url = document.getElementById('rss-input').value;
+            localStorage.setItem('vico_rss_url', url);
+            alert("RSS Guardado. Reiniciando feed...");
+            renderRSS();
+        }
+
+        function toggleSettings() {
+            document.getElementById('settings-modal').classList.toggle('hidden');
         }
     </script>
 </body>
