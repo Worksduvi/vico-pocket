@@ -1,17 +1,23 @@
 {
   "name": "VICO POCKET ELITE",
-  "short_name": "VicoPocket",
-  "description": "Tu centro de productividad impulsado por Gemini AI",
-  "start_url": ".",
+  "short_name": "VICO ELITE",
+  "description": "Tu suite de noticias RSS, notas y links personalizados con IA.",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#0b0f1a",
+  "background_color": "#000000",
   "theme_color": "#3b82f6",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "icon.png",
-      "sizes": "512x512",
+      "src": "icon-192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
 }
