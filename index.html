@@ -344,6 +344,13 @@ async function sendChatIA() {
         return;
     }
 
+    // 1. Aquí pegamos tu lista de modelos para que la función los conozca
+    const modelos = [
+        "gemini-2.0-pro-exp-02-05", 
+        "gemini-1.5-pro",           
+        "gemini-1.5-flash"          
+    ];
+
     // Renderizar mensaje del Admin
     chatContent.innerHTML += `<p class="bg-blue-600/20 p-2 rounded-xl text-[10px] self-end text-right"><b>Tú:</b> ${msgInput.value}</p>`;
     
@@ -353,37 +360,50 @@ async function sendChatIA() {
     msgInput.value = '';
     playUX('pop');
 
-    try {
-        // CORRECCIÓN SENIOR: Usamos backticks para que la ${userKey} se lea bien
-        const urlIA = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userKey}`;
-        
-        const response = await fetch(urlIA, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ parts: [{ text: userPrompt }] }]
-            })
-        });
+    let success = false;
 
-        const data = await response.json();
-        
-        if (data.error) throw new Error(data.error.message);
+    // 2. Este bucle intentará cada modelo de la lista hasta que uno funcione
+    for (const modelo of modelos) {
+        if (success) break; // Si ya funcionó uno, no intenta los demás
 
-        const aiResponse = data.candidates[0].content.parts[0].text;
+        try {
+            const urlIA = `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${userKey}`;
+            
+            const response = await fetch(urlIA, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: userPrompt }] }]
+                })
+            });
 
-        // Renderizar respuesta de la IA
-        chatContent.innerHTML += `<div class="bg-white/5 p-2 rounded-xl text-[10px] border-l-2 border-blue-500 mt-2">
-            <b>VICO IA:</b> ${aiResponse}
-        </div>`;
-        
-        chatContent.scrollTop = chatContent.scrollHeight;
-        playUX('pop');
-    } catch (error) {
-        console.error(error);
-        chatContent.innerHTML += `<p class="text-red-400 text-[9px] mt-2 italic">Error: ${error.message}. Revisa tu API Key en el Perfil.</p>`;
+            const data = await response.json();
+            
+            // Si el modelo actual da error, lanzamos al "catch" para que el bucle siga con el siguiente
+            if (data.error) throw new Error(data.error.message);
+
+            if (data.candidates && data.candidates[0].content.parts[0].text) {
+                const aiResponse = data.candidates[0].content.parts[0].text;
+
+                // Renderizar respuesta de la IA indicando qué modelo respondió
+                chatContent.innerHTML += `<div class="bg-white/5 p-2 rounded-xl text-[10px] border-l-2 border-blue-500 mt-2">
+                    <b>VICO IA (${modelo}):</b> ${aiResponse}
+                </div>`;
+                
+                success = true; // Marcamos éxito para detener el bucle
+            }
+        } catch (error) {
+            console.warn(`El modelo ${modelo} falló, intentando el siguiente...`);
+            // Si es el último modelo de la lista y falla, mostramos el error final
+            if (modelo === modelos[modelos.length - 1]) {
+                chatContent.innerHTML += `<p class="text-red-400 text-[9px] mt-2 italic">Error final: ${error.message}. Revisa tu API Key.</p>`;
+            }
+        }
     }
+    
+    chatContent.scrollTop = chatContent.scrollHeight;
+    if (success) playUX('pop');
 }
-
 
 function createNewButton() {
     const label = document.getElementById('btn-label').value;
