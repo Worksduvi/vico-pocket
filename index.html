@@ -170,6 +170,28 @@
     </nav>
 
     <script>
+        // --- FUNCIONES DE APOYO VICO ---
+function getFavicon(url) {
+    try {
+        const domain = new URL(url).hostname;
+        return `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+    } catch (e) {
+        return 'https://cdn-icons-png.flaticon.com/512/1243/1243933.png';
+    }
+}
+
+function getSlug(url) {
+    try {
+        const path = new URL(url).pathname;
+        const slug = path.split('/').filter(Boolean).pop();
+        return slug ? slug.replace(/-/g, ' ').toUpperCase() : 'ENLACE GUARDADO';
+    } catch (e) { return 'LINK'; }
+}
+
+function irAPayPal() {
+    window.open("https://www.paypal.me/texiduvi", '_blank');
+}
+
         // --- SISTEMA DE CAPTURA Y GUARDADO DE LINKS ---
 
 // 1. Capturar links compartidos desde Android (Botón Compartir Nativo)
@@ -367,18 +389,33 @@ function createNewButton() {
 
 function renderCustomButtons() {
     const container = document.getElementById('links-list');
+    container.innerHTML = ''; // Limpia para no duplicar
+
     customButtons.forEach((btn, index) => {
+        const foto = getFavicon(btn.url);
+        const titulo = btn.label || getSlug(btn.url);
+
         container.insertAdjacentHTML('beforeend', `
-            <div class="flex gap-2 items-center mb-2">
-                <button onclick="window.open('${btn.url}', '_blank')" class="${btn.color} ${btn.shape} flex-1 py-3 text-xs font-bold shadow-lg aura-btn uppercase">
-                    ${btn.label}
-                </button>
-                <button onclick="deleteCustomBtn(${index})" class="text-red-500 p-2"><i class="fa-solid fa-trash-can"></i></button>
+            <div class="glass p-4 rounded-2xl flex items-center gap-3 border border-white/10 mb-3">
+                <img src="${foto}" class="w-6 h-6 rounded-md">
+                <div class="flex-1 cursor-pointer" onclick="window.open('${btn.url}', '_self')">
+                    <h4 class="text-[11px] font-bold text-blue-400 uppercase">${titulo}</h4>
+                    <p class="text-[9px] opacity-60">Noticia y análisis disponible</p>
+                </div>
+                <div class="flex gap-1">
+                    <button onclick="shareItem('${titulo}', '${btn.url}')" class="text-blue-400 p-2"><i class="fa-solid fa-share-nodes"></i></button>
+                    <button onclick="deleteCustomBtn(${index})" class="text-red-500 p-2"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
             </div>`);
     });
 }
-// Añade esto al final de tus inicializaciones
-renderCustomButtons();
+
+function deleteCustomBtn(index) {
+    customButtons.splice(index, 1);
+    localStorage.setItem('vico_custom_btns', JSON.stringify(customButtons));
+    renderCustomButtons();
+}
+
  </script>
     <footer class="mt-10 mb-20 text-center px-4">
     <div class="glass p-4 rounded-3xl border border-white/5 opacity-80">
