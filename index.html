@@ -170,6 +170,62 @@
     </nav>
 
     <script>
+        // --- SISTEMA DE CAPTURA Y GUARDADO DE LINKS ---
+
+// 1. Capturar links compartidos desde Android (Botón Compartir Nativo)
+window.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const sharedUrl = params.get('url') || params.get('text');
+    const sharedTitle = params.get('title') || 'Link Guardado';
+
+    if (sharedUrl) {
+        saveLinkToVico(sharedTitle, sharedUrl);
+        // Limpiamos la URL para que no se guarde dos veces al recargar
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+});
+
+// 2. Función para guardar links (Se usa para compartir y para pegado manual)
+function saveLinkToVico(label, url) {
+    if(!url) return;
+    // Aseguramos que tenga http
+    if(!url.includes('http')) url = 'https://' + url;
+    
+    customButtons.unshift({ 
+        label: label, 
+        url: url, 
+        color: 'bg-blue-600', 
+        shape: 'rounded-lg' 
+    });
+    
+    localStorage.setItem('vico_custom_btns', JSON.stringify(customButtons));
+    renderCustomButtons();
+    if(typeof playUX === 'function') playUX('pop');
+}
+
+// 3. Lógica para el input de pegado manual (Añadir a la interfaz)
+function injectManualInput() {
+    const container = document.getElementById('v-links');
+    const manualHTML = `
+        <div class="glass p-3 rounded-2xl mb-6 flex gap-2 border border-white/5">
+            <input type="text" id="manual-url" placeholder="Pega una URL aquí..." class="flex-1 bg-white/5 p-2 rounded-xl text-[10px] outline-none border border-white/10">
+            <button onclick="addManualLink()" class="bg-blue-600 px-4 py-2 rounded-xl text-[10px] font-bold">AÑADIR</button>
+        </div>
+    `;
+    container.insertAdjacentHTML('afterbegin', manualHTML);
+}
+
+function addManualLink() {
+    const input = document.getElementById('manual-url');
+    if(input.value) {
+        saveLinkToVico('Enlace Guardado', input.value);
+        input.value = '';
+    }
+}
+
+// Llamar a la función para que aparezca el input al cargar
+setTimeout(injectManualInput, 500);
+
         // ESTADO
         let folders = JSON.parse(localStorage.getItem('vico_folders')) || ['General', 'Estrategia'];
         let activeFolder = 'General';
