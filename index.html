@@ -301,11 +301,22 @@ setTimeout(injectManualInput, 500);
         }
 
         // INIT
-        renderRSS(); switchTab('links'); renderFolders();
-        const ctxB = document.getElementById('chartBar'), ctxD = document.getElementById('chartDoughnut'), ctxC = document.getElementById('chartCylinder');
-        const chart1 = new Chart(ctxB, { type: 'bar', data: { labels: ['A','B','C'], datasets:[{data:[10,20,30],backgroundColor:['#3b82f6','#8b5cf6','#ec4899']}] }, options:{plugins:{legend:{display:false}}}});
-        const chart2 = new Chart(ctxD, { type: 'doughnut', data: { labels: ['X','Y','Z'], datasets:[{data:[10,20,30],backgroundColor:['#3b82f6','#8b5cf6','#ec4899']}] }, options:{plugins:{legend:{display:false}}}});
-        const chart3 = new Chart(ctxC, { type: 'bar', data: { labels: ['1','2','3'], datasets:[{data:[10,20,30],backgroundColor:['#3b82f6','#8b5cf6','#ec4899']}] }, options:{scales:{y:{display:false}},plugins:{legend:{display:false}}}});
+        function renderRSS() { 
+    const c = document.getElementById('rss-container'); 
+    c.innerHTML = rssList.map((item, i) => {
+        const icon = getFavicon(item.url);
+        return `
+        <div class="glass p-4 rounded-2xl flex items-center gap-3 border-l-4 border-blue-500 mb-3">
+            <img src="${icon}" class="w-5 h-5 opacity-80">
+            <div class="flex-1" onclick="window.open('${item.url}','_blank')">
+                <h4 class="text-[11px] font-bold uppercase">${item.title}</h4>
+                <p class="text-[9px] opacity-40">Feed de noticias activas</p>
+            </div>
+            <button onclick="rssList.splice(${i},1);renderRSS()" class="text-red-400 p-2"><i class="fa-solid fa-trash"></i></button>
+        </div>`;
+    }).join(''); 
+}
+
 
         function renderFolders() {
             const bar = document.getElementById('folder-bar'), select = document.getElementById('folder-target');
