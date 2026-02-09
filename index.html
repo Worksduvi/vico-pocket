@@ -344,31 +344,28 @@ async function sendChatIA() {
         return;
     }
 
-    // LISTA DE MODELOS: El código probará uno por uno hasta que uno funcione
     const modelos = [
-        "gemini-2.0-flash",         // Intenta primero el más nuevo
-        "gemini-1.5-pro",           // Luego la versión Pro estable
-        "gemini-1.5-flash",         // Luego la Flash estable
-        "gemini-pro"                // Como último recurso
+        "gemini-2.0-flash",
+        "gemini-1.5-pro",
+        "gemini-1.5-flash",
+        "gemini-pro"
     ];
 
-    // Renderizar mensaje del usuario
     chatContent.innerHTML += `<p class="bg-blue-600/20 p-2 rounded-xl text-[10px] self-end text-right"><b>Tú:</b> ${msgInput.value}</p>`;
     
     const context = "Eres VICO, el agente inteligente de VICO POCKET ELITE. Tu creador es el Admin AndyJavico. Responde de forma breve y técnica.";
     const userPrompt = context + " " + msgInput.value;
     
     msgInput.value = '';
-    playUX('pop');
+    if(typeof playUX === 'function') playUX('pop');
 
     let success = false;
 
-    // BUCLE DE REINTENTO: Recorre la lista de modelos
-    for (const modelo de modelos) {
+    // CORREGIDO: "of" en lugar de "de"
+    for (const modelo of modelos) {
         if (success) break;
 
         try {
-            // Construimos la URL con el modelo actual del bucle
             const urlIA = `https://generativelanguage.googleapis.com/v1beta/models/${modelo}:generateContent?key=${userKey}`;
             
             const response = await fetch(urlIA, {
@@ -381,13 +378,11 @@ async function sendChatIA() {
 
             const data = await response.json();
             
-            // Si este modelo da error, lanzamos excepción para que el "catch" pase al siguiente modelo
             if (data.error) throw new Error(data.error.message);
 
             if (data.candidates && data.candidates[0].content.parts[0].text) {
                 const aiResponse = data.candidates[0].content.parts[0].text;
 
-                // Renderizamos indicando qué modelo respondió con éxito
                 chatContent.innerHTML += `<div class="bg-white/5 p-2 rounded-xl text-[10px] border-l-2 border-blue-500 mt-2">
                     <b>VICO IA (${modelo}):</b> ${aiResponse}
                 </div>`;
@@ -396,17 +391,15 @@ async function sendChatIA() {
             }
         } catch (error) {
             console.warn(`Falló ${modelo}: ${error.message}`);
-            // Si es el último modelo de la lista y también falla, mostramos el error definitivo
             if (modelo === modelos[modelos.length - 1]) {
-                chatContent.innerHTML += `<p class="text-red-400 text-[9px] mt-2 italic">Error: No se pudo conectar con ningún modelo. Revisa tu Key en el Perfil.</p>`;
+                chatContent.innerHTML += `<p class="text-red-400 text-[9px] mt-2 italic">Error: No se pudo conectar. Revisa tu Key.</p>`;
             }
         }
     }
     
     chatContent.scrollTop = chatContent.scrollHeight;
-    if (success) playUX('pop');
+    if (success && typeof playUX === 'function') playUX('pop');
 }
-
 
 function createNewButton() {
     const label = document.getElementById('btn-label').value;
