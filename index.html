@@ -16,6 +16,8 @@
         .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
         .aura-btn { border: 1px solid var(--vacc); box-shadow: 0 0 10px var(--aura); transition: 0.3s; cursor: pointer; }
         .modal-full { position: fixed; inset: 0; background: var(--vbg); z-index: 9999; padding: 2rem; overflow-y: auto; display: none; }
+        .gold-grad { background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728) !important; color: #000 !important; }
+        .cyber-grad { background: linear-gradient(135deg, #2d00f7, #ff00bd) !important; color: #fff !important; }
         .tab-active { color: var(--vacc); border-bottom: 2px solid var(--vacc); opacity: 1 !important; }
         .chat-box { width: 320px; height: 450px; display: none; flex-direction: column; z-index: 9000; }
         @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
@@ -41,67 +43,65 @@
     </header>
 
     <nav class="flex gap-4 mb-6 border-b border-white/10 text-[11px] font-black pb-2 overflow-x-auto">
-        <button onclick="switchTab('home')" id="btn-home" class="tab-active uppercase menu-item">Home🏡</button>
-        <button onclick="switchTab('links')" id="btn-links" class="opacity-40 uppercase menu-item">Links🔗</button>
-        <button onclick="switchTab('notes')" id="btn-notes" class="opacity-40 uppercase menu-item">Notas📝</button>
-        <button onclick="switchTab('rss')" id="btn-rss" class="opacity-40 uppercase menu-item">RSS Feed📰</button>
-        <button onclick="switchTab('data')" id="btn-data" class="opacity-40 uppercase text-purple-400 menu-item">Análisis🪄</button>
+        <button onclick="switchTab('home')" id="btn-home" class="tab-active uppercase">Home🏡</button>
+        <button onclick="switchTab('links')" id="btn-links" class="opacity-40 uppercase">Links🔗</button>
+        <button onclick="switchTab('notes')" id="btn-notes" class="opacity-40 uppercase">Notas📝</button>
+        <button onclick="switchTab('rss')" id="btn-rss" class="opacity-40 uppercase">RSS Feed📰</button>
+        <button onclick="switchTab('data')" id="btn-data" class="opacity-40 uppercase text-purple-400">Análisis🪄</button>
     </nav>
 
     <main id="app-content">
         <section id="v-home" class="space-y-6">
             <div class="glass p-4 rounded-3xl border border-blue-500/20">
-                <h3 class="text-[11px] font-black text-blue-400 mb-3 uppercase tracking-tighter">Resumen Inteligente</h3>
+                <h3 class="text-[11px] font-black text-blue-400 mb-3 uppercase tracking-tighter">Dashboard</h3>
                 <div class="home-grid">
-                    <div class="glass p-3 rounded-2xl">
-                        <span class="text-[9px] opacity-50 block">Notas</span>
+                    <div class="glass p-3 rounded-2xl text-center">
+                        <span class="text-[9px] opacity-50 block uppercase">Notas</span>
                         <span id="dash-notes-count" class="text-lg font-bold">0</span>
                     </div>
-                    <div class="glass p-3 rounded-2xl">
-                        <span class="text-[9px] opacity-50 block">Links</span>
+                    <div class="glass p-3 rounded-2xl text-center">
+                        <span class="text-[9px] opacity-50 block uppercase">Links</span>
                         <span id="dash-links-count" class="text-lg font-bold">0</span>
                     </div>
                 </div>
             </div>
-            <div id="tech-discovery" class="space-y-3">
-                <h3 class="text-[11px] font-black text-purple-400 uppercase">Discovery: Tech & IA</h3>
-                <div class="p-4 text-center text-[10px] opacity-50 italic">Cargando noticias...</div>
-            </div>
+            <div id="tech-discovery" class="space-y-3"></div>
         </section>
 
         <section id="v-links" class="hidden space-y-4">
             <div class="glass p-3 rounded-2xl mb-6 flex gap-2 border border-white/5">
-                <input type="text" id="manual-url" placeholder="Pega una URL aquí..." class="flex-1 bg-white/5 p-2 rounded-xl text-[10px] outline-none border border-white/10">
+                <input type="text" id="manual-url" placeholder="Pega una URL aquí..." class="flex-1 bg-white/5 p-2 rounded-xl text-[10px] outline-none">
                 <button onclick="addManualLink()" class="bg-blue-600 px-4 py-2 rounded-xl text-[10px] font-bold">AÑADIR</button>
             </div>
             <div id="links-list" class="grid gap-3"></div>
         </section>
 
         <section id="v-notes" class="hidden space-y-4">
-            <div id="folder-bar" class="flex gap-2 overflow-x-auto py-2"></div>
             <div class="glass p-4 rounded-3xl border border-blue-500/20">
                 <textarea id="note-input" class="w-full bg-transparent text-xs h-24 outline-none" placeholder="Escribe tu idea..."></textarea>
-                <div class="flex justify-between items-center mt-2">
-                    <select id="folder-target" class="bg-black/40 text-[10px] p-2 rounded-xl border border-white/10"></select>
-                    <button onclick="saveNote()" class="bg-blue-600 px-6 py-2 rounded-2xl text-xs font-bold aura-btn">GUARDAR</button>
-                </div>
+                <button onclick="saveNote()" class="w-full bg-blue-600 py-2 rounded-xl text-xs font-bold aura-btn">GUARDAR NOTA</button>
             </div>
             <div id="notes-grid" class="grid grid-cols-2 gap-3"></div>
         </section>
 
         <section id="v-rss" class="hidden space-y-4">
             <div class="glass p-4 rounded-3xl border border-blue-500/10 mb-4">
-                <input type="text" id="rss-name" placeholder="Nombre Canal" class="w-full bg-white/5 p-2 rounded-xl text-[10px] mb-2 border border-white/10">
-                <input type="text" id="rss-url" placeholder="URL Feed" class="w-full bg-white/5 p-2 rounded-xl text-[10px] mb-3 border border-white/10">
+                <input type="text" id="rss-name" placeholder="Nombre Canal" class="w-full bg-white/5 p-2 rounded-xl text-[10px] mb-2">
+                <input type="text" id="rss-url" placeholder="URL Feed" class="w-full bg-white/5 p-2 rounded-xl text-[10px] mb-3">
                 <button onclick="addRSS()" class="w-full bg-blue-600 py-2 rounded-xl text-[10px] font-bold uppercase">Añadir Feed</button>
             </div>
             <div id="rss-container" class="space-y-4"></div>
         </section>
 
-        <section id="v-data" class="hidden space-y-6 text-center">
-            <p class="text-[10px] opacity-50">Análisis Predictivo VICO 2026</p>
-            <div class="grid grid-cols-1 gap-4">
-                <canvas id="chartBar" class="glass p-4 rounded-2xl max-h-[200px]"></canvas>
+        <section id="v-data" class="hidden space-y-6">
+            <div class="glass p-4 rounded-3xl">
+                <input type="text" id="ai-prompt" placeholder="Comparativa viralidad IA vs Web3 2026..." class="w-full bg-white/5 p-3 rounded-2xl text-xs mb-3 border border-white/10 outline-none">
+                <button onclick="runAnalysisIA()" class="w-full bg-purple-600 py-3 rounded-2xl text-xs font-bold aura-btn">GENERAR ANÁLISIS ESTRATÉGICO</button>
+            </div>
+            <div class="grid grid-cols-1 gap-6">
+                <canvas id="chartDoughnut" class="glass p-4 rounded-2xl"></canvas>
+                <canvas id="chartBar" class="glass p-4 rounded-2xl"></canvas>
+                <div id="ai-report" class="glass p-5 rounded-2xl text-[10px] leading-relaxed hidden border-l-4 border-purple-500 text-left"></div>
             </div>
         </section>
     </main>
@@ -114,7 +114,41 @@
         <div id="chat-content" class="flex-1 p-3 overflow-y-auto text-[10px] space-y-2"></div>
         <div class="p-2 border-t border-white/10 flex gap-2">
             <input type="text" id="chat-msg" class="flex-1 bg-black/40 p-2 rounded-xl text-[10px] outline-none" placeholder="Pregunta algo...">
-            <button onclick="sendChatIA()" class="bg-blue-600 p-2 rounded-xl"><i class="fa-solid fa-paper-plane"></i></button>
+            <button onclick="sendChatIA()" class="bg-blue-600 px-3 rounded-xl"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <div id="profile-modal" class="modal-full">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-black italic text-blue-500">CONFIGURACIÓN</h2>
+            <button onclick="closeProfile()" class="text-3xl">&times;</button>
+        </div>
+        <div class="space-y-6">
+            <div class="glass p-5 rounded-3xl border-l-4 border-yellow-500">
+                <h4 class="text-[10px] font-bold mb-2 uppercase text-yellow-500">IA Intelligence API</h4>
+                <input type="password" id="api-key-input" placeholder="Pega tu Key de Gemini o Groq..." class="w-full bg-black/50 p-3 rounded-2xl text-xs border border-white/10 mt-2">
+                <button onclick="saveSettings()" class="w-full bg-blue-600 py-3 rounded-xl mt-3 font-bold text-xs aura-btn uppercase">Guardar Cerebro</button>
+            </div>
+
+            <div class="flex justify-between items-center glass p-4 rounded-3xl">
+                <span class="text-xs font-bold uppercase">Sonidos UX</span>
+                <input type="checkbox" id="sound-toggle" class="w-6 h-6 accent-blue-500" checked>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="changeTheme('gold')" class="gold-grad p-4 rounded-3xl text-xs font-bold uppercase">Gold Edition</button>
+                <button onclick="changeTheme('cyber')" class="cyber-grad p-4 rounded-3xl text-xs font-bold uppercase">Cyber Aura</button>
+            </div>
+
+            <div class="glass p-4 rounded-3xl border border-blue-500/20">
+                <h4 class="text-[10px] font-bold mb-3 uppercase text-blue-400">Creador de Botones Pro</h4>
+                <input type="text" id="btn-label" placeholder="Título..." class="w-full bg-black/40 p-2 rounded-xl text-xs mb-2">
+                <input type="text" id="btn-url" placeholder="URL..." class="w-full bg-black/40 p-2 rounded-xl text-xs mb-3">
+                <button onclick="createNewButton()" class="w-full bg-blue-600 py-2 rounded-xl text-[10px] font-bold aura-btn uppercase">Generar Botón</button>
+            </div>
+
+            <button onclick="window.open('https://www.paypal.me/texiduvi')" class="w-full bg-yellow-500 text-black py-4 rounded-3xl font-black uppercase aura-btn">Invitarme un café ☕</button>
+            <button onclick="clearVicoCache()" class="w-full bg-red-600/20 text-red-400 py-2 rounded-xl text-[10px] font-bold uppercase mt-6">Limpiar Caché App</button>
         </div>
     </div>
 
@@ -125,108 +159,89 @@
         <button onclick="openProfile()" class="p-4 aura-btn rounded-full"><i class="fa-solid fa-id-card-clip"></i></button>
     </nav>
 
-    <div id="profile-modal" class="modal-full">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-black italic text-blue-500">CONFIGURACIÓN</h2>
-            <button onclick="closeProfile()" class="text-3xl">&times;</button>
-        </div>
-        <div class="space-y-4">
-            <div class="glass p-5 rounded-3xl border-l-4 border-yellow-500">
-                <h4 class="text-[10px] font-bold mb-2 uppercase text-yellow-500">API KEY GEMINI</h4>
-                <input type="password" id="api-key-input" placeholder="Pega tu Key aquí..." class="w-full bg-black/50 p-3 rounded-2xl text-xs border border-white/10 mt-2">
-                <button onclick="saveSettings()" class="w-full bg-blue-600 py-3 rounded-xl mt-3 font-bold text-xs uppercase">Guardar Cerebro</button>
-            </div>
-            <button onclick="irAPayPal()" class="w-full bg-yellow-500 text-black py-4 rounded-3xl font-black flex items-center justify-center gap-2 uppercase">
-                <i class="fa-brands fa-paypal"></i> Invitarme un café ☕
-            </button>
-            <button onclick="clearVicoCache()" class="w-full bg-red-600/20 text-red-400 py-2 rounded-xl text-[10px] font-bold uppercase mt-10">Limpiar Caché App</button>
-        </div>
-    </div>
-
     <script>
-        // ESTADO Y PERSISTENCIA
         let notes = JSON.parse(localStorage.getItem('vico_notes')) || [];
-        let folders = JSON.parse(localStorage.getItem('vico_folders')) || ['General', 'Estrategia'];
         let customButtons = JSON.parse(localStorage.getItem('vico_custom_btns')) || [];
-        let rssList = JSON.parse(localStorage.getItem('vico_rss')) || [
-            {title: "Xataka", url: "https://www.xataka.com/feed/full"},
-            {title: "Wired", url: "https://www.wired.com/feed/rss"}
-        ];
+        let rssList = JSON.parse(localStorage.getItem('vico_rss')) || [];
+        let charts = {};
 
-        // UTILIDADES
-        function getFavicon(url) {
-            try { return `https://www.google.com/s2/favicons?sz=128&domain=${new URL(url).hostname}`; }
-            catch { return 'icon.png'; }
-        }
-
-        function playUX(type) {
-            const sounds = { click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', pop: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3' };
-            new Audio(sounds[type]).play().catch(()=>{});
-        }
-
-        // NAVIGATION
+        // NAVEGACIÓN
         function switchTab(tab) {
             ['home', 'links', 'notes', 'rss', 'data'].forEach(t => {
-                document.getElementById(`v-${t}`).classList.add('hidden');
-                document.getElementById(`btn-${t}`).classList.replace('tab-active', 'opacity-40');
+                const el = document.getElementById(`v-${t}`);
+                if(el) el.classList.add('hidden');
             });
             document.getElementById(`v-${tab}`).classList.remove('hidden');
-            document.getElementById(`btn-${tab}`).classList.add('tab-active');
-            document.getElementById(`btn-${tab}`).classList.remove('opacity-40');
             if(tab === 'home') renderDashboard();
             playUX('click');
         }
 
         function toggleElement(id) {
             const el = document.getElementById(id);
-            const isOpen = el.style.display === 'flex';
-            el.style.display = isOpen ? 'none' : 'flex';
-            if(!isOpen && id === 'ai-chat-container' && document.getElementById('chat-content').children.length === 0) {
-                document.getElementById('chat-content').innerHTML = '<p class="italic opacity-50">Hola Admin. VICO listo.</p>';
-            }
+            el.style.display = (el.style.display === 'flex') ? 'none' : 'flex';
         }
 
         function openProfile() { document.getElementById('profile-modal').style.display = 'block'; }
         function closeProfile() { document.getElementById('profile-modal').style.display = 'none'; }
 
-        // LINKS LOGIC
+        // UTILIDADES UX
+        function playUX(type) {
+            if(!document.getElementById('sound-toggle').checked) return;
+            const sounds = { click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', pop: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3' };
+            new Audio(sounds[type]).play().catch(()=>{});
+        }
+
+        function toggleDarkMode() { document.body.classList.toggle('light-mode'); }
+        function changeTheme(t) { document.body.className = `p-4 pb-48 ${t}-grad`; }
+
+        // LINKS & BOTONES
+        function renderCustomButtons() {
+            const container = document.getElementById('links-list');
+            container.innerHTML = customButtons.map((btn, i) => `
+                <div class="glass p-4 rounded-2xl flex items-center gap-4 border border-white/10">
+                    <img src="${btn.favicon || 'icon.png'}" class="w-10 h-10 rounded-xl bg-white/10">
+                    <div class="flex-1" onclick="window.open('${btn.url}', '_self')">
+                        <h4 class="text-[10px] font-bold text-blue-400 uppercase leading-tight">${btn.label}</h4>
+                        <p class="text-[8px] opacity-40 truncate">${btn.url}</p>
+                    </div>
+                    <button onclick="deleteLink(${i})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+                </div>`).join('');
+        }
+
         async function saveLinkToVico(label, url) {
             if(!url) return;
             if(!url.includes('http')) url = 'https://' + url;
             const domain = new URL(url).hostname;
-            const slug = url.split('/').filter(Boolean).pop() || domain;
-            const finalTitle = label === 'Enlace Guardado' ? slug.replace(/-/g, ' ').toUpperCase().substring(0, 35) : label;
-
-            customButtons.unshift({ label: finalTitle, url, favicon: getFavicon(url) });
+            const favicon = `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
+            customButtons.unshift({ label, url, favicon });
             localStorage.setItem('vico_custom_btns', JSON.stringify(customButtons));
             renderCustomButtons();
             renderDashboard();
-            playUX('pop');
         }
 
         function addManualLink() {
-            const input = document.getElementById('manual-url');
-            if(input.value) { saveLinkToVico('Enlace Guardado', input.value); input.value = ''; }
+            const val = document.getElementById('manual-url').value;
+            if(val) { saveLinkToVico('Enlace Guardado', val); document.getElementById('manual-url').value = ''; }
         }
 
-        function renderCustomButtons() {
-            const container = document.getElementById('links-list');
-            container.innerHTML = customButtons.map((btn, i) => `
-                <div class="glass p-4 rounded-2xl flex items-center gap-4 border border-white/10 shadow-xl">
-                    <img src="${btn.favicon}" class="w-10 h-10 rounded-xl bg-white/10">
-                    <div class="flex-1 cursor-pointer" onclick="window.open('${btn.url}', '_self')">
-                        <h4 class="text-[10px] font-bold text-blue-400 uppercase leading-tight">${btn.label}</h4>
-                        <p class="text-[8px] opacity-40 truncate">${btn.url}</p>
-                    </div>
-                    <button onclick="customButtons.splice(${i},1);localStorage.setItem('vico_custom_btns', JSON.stringify(customButtons));renderCustomButtons()" class="text-red-500 p-2"><i class="fa-solid fa-trash"></i></button>
-                </div>`).join('');
+        function deleteLink(i) {
+            customButtons.splice(i, 1);
+            localStorage.setItem('vico_custom_btns', JSON.stringify(customButtons));
+            renderCustomButtons();
+            renderDashboard();
         }
 
-        // NOTES LOGIC
+        function createNewButton() {
+            const label = document.getElementById('btn-label').value;
+            const url = document.getElementById('btn-url').value;
+            if(label && url) { saveLinkToVico(label, url); document.getElementById('btn-label').value = ''; document.getElementById('btn-url').value = ''; }
+        }
+
+        // NOTAS
         function saveNote() {
             const body = document.getElementById('note-input').value;
             if(body) {
-                notes.push({ body, folder: 'General' });
+                notes.push({ body });
                 localStorage.setItem('vico_notes', JSON.stringify(notes));
                 document.getElementById('note-input').value = '';
                 renderNotes();
@@ -247,47 +262,127 @@
 
         async function fetchDiscoveryNews() {
             const container = document.getElementById('tech-discovery');
-            const feeds = ['https://www.wired.com/feed/rss', 'https://www.technologyreview.com/feed/'];
             try {
-                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feeds[0])}`);
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.wired.com/feed/rss`);
                 const data = await res.json();
                 container.innerHTML = '<h3 class="text-[11px] font-black text-purple-400 uppercase mb-3">Discovery Tech</h3>' + 
                     data.items.slice(0, 3).map(item => `
                     <div class="glass p-3 rounded-2xl mb-2 flex gap-3 items-center" onclick="window.open('${item.link}', '_blank')">
-                        <img src="${item.thumbnail || getFavicon(item.link)}" class="w-8 h-8 rounded-lg">
+                        <img src="${item.thumbnail}" class="w-8 h-8 rounded-lg">
                         <h4 class="text-[9px] font-bold leading-tight">${item.title}</h4>
                     </div>`).join('');
-            } catch (e) { container.innerHTML = '<p class="text-[9px] opacity-30">Conecta a la red para Discovery.</p>'; }
+            } catch (e) { container.innerHTML = '<p class="text-[9px] opacity-30 italic">Discovery en espera...</p>'; }
         }
 
-        // CHAT IA MULTIMODELO
+        // CHAT MULTI-API MASTER
+        async function sendChatIA() {
+            const msgInput = document.getElementById('chat-msg');
+            const chatContent = document.getElementById('chat-content');
+            const userKey = localStorage.getItem('vico_api_key');
+            if (!msgInput.value || !userKey) return;
 
-        // INIT
+            const text = msgInput.value;
+            chatContent.innerHTML += `<p class="bg-blue-600/20 p-2 rounded-xl text-right">Tú: ${text}</p>`;
+            msgInput.value = '';
+
+            const isGemini = userKey.startsWith('AIza');
+            const prompt = `Eres VICO (agente de AndyJavico). Responde breve: ${text}`;
+
+            try {
+                let aiResponse = "";
+                if (isGemini) {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${userKey}`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                    });
+                    const data = await res.json();
+                    aiResponse = data.candidates[0].content.parts[0].text;
+                } else {
+                    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${userKey}`},
+                        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role: "user", content: prompt}] })
+                    });
+                    const data = await res.json();
+                    aiResponse = data.choices[0].message.content;
+                }
+                chatContent.innerHTML += `<div class="bg-white/5 p-2 rounded-xl border-l-2 border-blue-500 mt-2">VICO: ${aiResponse}</div>`;
+                chatContent.scrollTop = chatContent.scrollHeight;
+                playUX('pop');
+            } catch (e) { chatContent.innerHTML += `<p class="text-red-400">Sin conexión...</p>`; }
+        }
+
+        // ANÁLISIS IA & GRÁFICAS
+        async function runAnalysisIA() {
+            const promptText = document.getElementById('ai-prompt').value;
+            const userKey = localStorage.getItem('vico_api_key');
+            const reportDiv = document.getElementById('ai-report');
+            if(!promptText || !userKey) return;
+
+            reportDiv.classList.remove('hidden');
+            reportDiv.innerHTML = "Generando análisis predictivo...";
+
+            const command = `Genera un análisis de: "${promptText}". Responde solo con un JSON puro con estos campos: labels (3 strings), data (3 números que sumen 100), analisis (texto breve), refs (2 urls).`;
+
+            try {
+                let dataIA;
+                if (userKey.startsWith('AIza')) {
+                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${userKey}`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ contents: [{ parts: [{ text: command }] }] })
+                    });
+                    const result = await res.json();
+                    dataIA = JSON.parse(result.candidates[0].content.parts[0].text.replace(/```json|```/g, ''));
+                } else {
+                    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${userKey}`},
+                        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role: "user", content: command}] })
+                    });
+                    const result = await res.json();
+                    dataIA = JSON.parse(result.choices[0].message.content.replace(/```json|```/g, ''));
+                }
+
+                updateCharts(dataIA.labels, dataIA.data);
+                reportDiv.innerHTML = `<p class="font-black text-blue-400 mb-2">VICO ANALYSIS REPORT</p><p class="mb-4">${dataIA.analisis}</p><p class="font-bold text-purple-400 mb-1 italic text-[9px]">REFERENCIAS:</p><ul>${dataIA.refs.map(r => `<li><a href="${r}" target="_blank" class="underline opacity-60">${r}</a></li>`).join('')}</ul>`;
+            } catch (e) { reportDiv.innerHTML = "Error en el procesamiento IA."; }
+        }
+
+        function updateCharts(labels, values) {
+            const colors = ['#3b82f6', '#8b5cf6', '#ec4899'];
+            if(charts.bar) charts.bar.destroy();
+            if(charts.doughnut) charts.doughnut.destroy();
+
+            charts.bar = new Chart(document.getElementById('chartBar'), {
+                type: 'bar',
+                data: { labels, datasets: [{ label: 'Volumen', data: values, backgroundColor: colors }] },
+                options: { plugins: { legend: { display: false } } }
+            });
+
+            charts.doughnut = new Chart(document.getElementById('chartDoughnut'), {
+                type: 'doughnut',
+                data: { labels, datasets: [{ data: values, backgroundColor: colors }] },
+                options: { cutout: '70%' }
+            });
+        }
+
+        // CONFIG
         function saveSettings() {
-            const key = document.getElementById('api-key-input').value;
-            localStorage.setItem('vico_api_key', key);
-            updateApiStatus(true);
-            alert("Cerebro sincronizado.");
+            localStorage.setItem('vico_api_key', document.getElementById('api-key-input').value);
+            alert("Sincronizado Admin.");
+            location.reload();
         }
 
-        function updateApiStatus(connected) {
-    const btn = document.querySelector('button[onclick="saveSettings()"]');
-    if(btn && connected) {
-        btn.classList.add('api-connected');
-        btn.innerHTML = '<i class="fa-solid fa-microchip"></i> MULTI-API ACTIVA';
-    }
-}
-
-        function irAPayPal() { window.open("https://www.paypal.me/texiduvi", '_blank'); }
         function clearVicoCache() { localStorage.clear(); location.reload(); }
 
         window.addEventListener('DOMContentLoaded', () => {
-            const savedKey = localStorage.getItem('vico_api_key');
-            if(savedKey) { document.getElementById('api-key-input').value = savedKey; updateApiStatus(true); }
             renderCustomButtons();
             renderNotes();
             renderDashboard();
             fetchDiscoveryNews();
+            if(localStorage.getItem('vico_api_key')) document.querySelector('button[onclick="saveSettings()"]').classList.add('api-connected');
         });
     </script>
 </body>
