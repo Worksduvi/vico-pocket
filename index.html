@@ -305,6 +305,45 @@ setTimeout(injectManualInput, 500);
             {title: "Xataka", url: "https://www.xataka.com/rss"},
             {title: "Wired", url: "https://www.wired.com/feed/rss"}
         ];
+// --- FUNCIONES DE UTILIDAD Y NAVEGACIÓN ---
+
+// 1. Configuración de tu PayPal (Abre en navegador externo)
+function irAPayPal() {
+    window.open("https://www.paypal.me/texiduvi", '_blank');
+}
+
+// 2. Obtener el favicon de la web
+function getFavicon(url) {
+    try {
+        const domain = new URL(url).hostname;
+        return `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
+    } catch (e) {
+        return 'https://cdn-icons-png.flaticon.com/512/1243/1243933.png'; 
+    }
+}
+
+// 3. Crear título automático desde la URL (Slug)
+function getSlugFromUrl(url) {
+    try {
+        const path = new URL(url).pathname;
+        const slug = path.split('/').filter(Boolean).pop();
+        return slug ? slug.replace(/-/g, ' ').toUpperCase() : 'ENLACE GUARDADO';
+    } catch (e) {
+        return 'ENLACE GUARDADO';
+    }
+}
+
+// 4. Gestión manual de Feeds RSS
+function addRSS() {
+    const name = document.getElementById('rss-name').value;
+    const url = document.getElementById('rss-url').value;
+    if(name && url) {
+        rssList.push({title: name, url: url});
+        renderRSS();
+        document.getElementById('rss-name').value = '';
+        document.getElementById('rss-url').value = '';
+    }
+}
 
         // POMODORO
         let pomoActive = false, pomoTime, pomoInterval;
