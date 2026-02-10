@@ -239,22 +239,40 @@ window.addEventListener('DOMContentLoaded', () => {
 });
 
 // 2. Función para guardar links (Se usa para compartir y para pegado manual)
-function saveLinkToVico(label, url) {
+// 2.1. Función para guardar links (Versión Inteligente con Favicon y Título)
+async function saveLinkToVico(label, url) {
     if(!url) return;
     // Aseguramos que tenga http
     if(!url.includes('http')) url = 'https://' + url;
     
+    // VICO extrae datos automáticamente de la URL
+    const domain = new URL(url).hostname;
+    const favicon = `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
+    
+    // Si no tiene título (label), creamos uno limpio desde la URL
+    let finalTitle = label;
+    if (label === 'Enlace Guardado' || !label) {
+        const slug = url.split('/').filter(Boolean).pop() || domain;
+        finalTitle = slug.replace(/-/g, ' ').toUpperCase().substring(0, 40);
+    }
+
     customButtons.unshift({ 
-        label: label, 
+        label: finalTitle, 
         url: url, 
+        favicon: favicon,
+        excerpt: `Contenido detectado en ${domain}...`, // Extracto automático inicial
         color: 'bg-blue-600', 
         shape: 'rounded-lg' 
     });
     
     localStorage.setItem('vico_custom_btns', JSON.stringify(customButtons));
     renderCustomButtons();
+    
+    // Si la pestaña Home existe, actualizamos los números del Dashboard
+    if(typeof renderDashboard === 'function') renderDashboard();
     if(typeof playUX === 'function') playUX('pop');
 }
+
 
 // 3. Lógica para el input de pegado manual (Añadir a la interfaz)
 function injectManualInput() {
