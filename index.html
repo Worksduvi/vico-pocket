@@ -444,49 +444,46 @@ async function sendChatIA() {
 
     if (!msgInput.value || !userKey) return;
 
-    // Renderizar mensaje del usuario
-    chatContent.innerHTML += `<p class="bg-blue-600/20 p-2 rounded-xl text-[10px] self-end text-right"><b>Tú:</b> ${msgInput.value}</p>`;
-    const userPrompt = msgInput.value;
-    msgInput.value = '';
-
-    // LISTA DE INTENTOS (URLs que Google acepta según el día/región)
+    // Lista de URLs dinámicas para saltar el error 404 de región
     const intentos = [
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${userKey}`,
-        `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${userKey}`,
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${userKey}`
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${userKey}`,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${userKey}`,
+        `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${userKey}`
     ];
+
+    chatContent.innerHTML += `<p class="bg-blue-600/20 p-2 rounded-xl text-[10px] self-end text-right"><b>Tú:</b> ${msgInput.value}</p>`;
+    const userPrompt = "Eres VICO de VICO POCKET ELITE. Creador: AndyJavico. Responde breve: " + msgInput.value;
+    msgInput.value = '';
 
     let success = false;
 
-    for (const url of intentos) {
+    for (const urlIA of intentos) {
         if (success) break;
         try {
-            const response = await fetch(url, {
+            const response = await fetch(urlIA, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ contents: [{ parts: [{ text: userPrompt }] }] })
             });
 
             const data = await response.json();
+            if (data.error) throw new Error(data.error.message);
 
             if (data.candidates && data.candidates[0].content.parts[0].text) {
                 const aiResponse = data.candidates[0].content.parts[0].text;
-                const modelLabel = url.includes('1.5') ? '1.5 Flash' : 'Pro 1.0';
-
                 chatContent.innerHTML += `<div class="bg-white/5 p-2 rounded-xl text-[10px] border-l-2 border-blue-500 mt-2">
-                    <b>VICO IA (${modelLabel}):</b> ${aiResponse}
+                    <b>VICO IA:</b> ${aiResponse}
                 </div>`;
                 success = true;
             }
-        } catch (e) {
-            console.error("Fallo en intento:", url);
+        } catch (error) {
+            console.warn("Intento fallido:", urlIA, error.message);
         }
     }
 
     if (!success) {
-        chatContent.innerHTML += `<p class="text-red-400 text-[9px] mt-2">VICO: Sigo sin encontrar el modelo en esta región. Revisa si tu Key tiene restricciones en Google AI Studio.</p>`;
+        chatContent.innerHTML += `<p class="text-red-400 text-[9px] mt-2 italic">Error: No se encontró modelo compatible en esta región (Hong Kong). Revisa tu VPN o API Key.</p>`;
     }
-    
     chatContent.scrollTop = chatContent.scrollHeight;
 }
 
@@ -565,7 +562,7 @@ function toggleElement(id) {
         const chatContent = document.getElementById('chat-content');
         if(chatContent && chatContent.children.length === 0) {
             chatContent.innerHTML = `<p class="bg-blue-600/10 p-2 rounded-xl text-[10px] italic text-blue-300">
-                Hola Admin AndyJavico. VICO POCKET ELITE está listo. ¿Qué analizamos hoy?
+                Hola! VICO POCKET ELITE está listo. ¿Qué analizamos hoy?
             </p>`;
         }
     }
