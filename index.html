@@ -110,13 +110,14 @@
         </section>
 
         <section id="v-rss" class="hidden space-y-4">
-            <div id="rss-container" class="space-y-4"></div>
-            <div class="glass p-4 rounded-3xl border border-blue-500/10 mb-4">
-    <input type="text" id="rss-name" placeholder="Nombre (ej. Xataka)" class="w-full bg-white/5 p-2 rounded-xl text-[10px] mb-2">
-    <input type="text" id="rss-url" placeholder="URL del Feed RSS" class="w-full bg-white/5 p-2 rounded-xl text-[10px] mb-2">
-    <button onclick="addRSS()" class="w-full bg-blue-600 py-2 rounded-xl text-[10px] font-bold">AÑADIR FEED</button>
-</div>
-    </section>
+    <div class="glass p-4 rounded-3xl border border-blue-500/10 mb-4">
+        <h4 class="text-[10px] font-bold mb-3 uppercase text-blue-400">Nuevo Canal RSS</h4>
+        <input type="text" id="rss-name" placeholder="Nombre (ej. Xataka)" class="w-full bg-white/5 p-2 rounded-xl text-[10px] mb-2 border border-white/10 outline-none">
+        <input type="text" id="rss-url" placeholder="URL del Feed (https://...)" class="w-full bg-white/5 p-2 rounded-xl text-[10px] mb-3 border border-white/10 outline-none">
+        <button onclick="addRSS()" class="w-full bg-blue-600 py-2 rounded-xl text-[10px] font-bold aura-btn uppercase">Añadir a mi Feed</button>
+    </div>
+    <div id="rss-container" class="space-y-4"></div>
+</section>
 
         <section id="v-data" class="hidden space-y-6">
             <div class="glass p-4 rounded-3xl">
