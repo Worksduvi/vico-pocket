@@ -603,6 +603,23 @@ async function fetchDiscoveryNews() {
             </div>`;
     }
 }
+// A. Auto-guardado de borrador de notas
+document.getElementById('note-input')?.addEventListener('input', (e) => {
+    localStorage.setItem('vico_note_draft', e.target.value);
+});
+
+// B. Detector de conexión para Discovery
+window.addEventListener('online', () => fetchDiscoveryNews());
+window.addEventListener('offline', () => {
+    const disc = document.getElementById('tech-discovery');
+    if(disc) disc.innerHTML = '<p class="text-[9px] opacity-40 p-4 text-center">Modo Offline Activo 🛰️</p>';
+});
+
+// C. Recuperar borrador al cargar
+const draft = localStorage.getItem('vico_note_draft');
+if(draft && document.getElementById('note-input')) {
+    document.getElementById('note-input').value = draft;
+}
 
  </script>
     <footer class="mt-10 mb-20 text-center px-4">
