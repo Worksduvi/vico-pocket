@@ -261,34 +261,6 @@
         }
 
         // CHAT IA MULTIMODELO
-        async function sendChatIA() {
-            const msgInput = document.getElementById('chat-msg');
-            const chatContent = document.getElementById('chat-content');
-            const userKey = localStorage.getItem('vico_api_key');
-            if (!msgInput.value || !userKey) return;
-
-            chatContent.innerHTML += `<p class="bg-blue-600/20 p-2 rounded-xl text-right">Tú: ${msgInput.value}</p>`;
-            const prompt = msgInput.value;
-            msgInput.value = '';
-
-            const endpoints = [
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${userKey}`,
-                `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${userKey}`
-            ];
-
-            for (const url of endpoints) {
-                try {
-                    const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }) });
-                    const data = await res.json();
-                    if(data.candidates) {
-                        chatContent.innerHTML += `<div class="bg-white/5 p-2 rounded-xl border-l-2 border-blue-500 mt-2">VICO: ${data.candidates[0].content.parts[0].text}</div>`;
-                        chatContent.scrollTop = chatContent.scrollHeight;
-                        return;
-                    }
-                } catch (e) {}
-            }
-            chatContent.innerHTML += '<p class="text-red-400">Error de conexión regional.</p>';
-        }
 
         // INIT
         function saveSettings() {
@@ -299,9 +271,12 @@
         }
 
         function updateApiStatus(connected) {
-            const btn = document.querySelector('button[onclick="saveSettings()"]');
-            if(btn && connected) btn.classList.add('api-connected');
-        }
+    const btn = document.querySelector('button[onclick="saveSettings()"]');
+    if(btn && connected) {
+        btn.classList.add('api-connected');
+        btn.innerHTML = '<i class="fa-solid fa-microchip"></i> MULTI-API ACTIVA';
+    }
+}
 
         function irAPayPal() { window.open("https://www.paypal.me/texiduvi", '_blank'); }
         function clearVicoCache() { localStorage.clear(); location.reload(); }
