@@ -1,4 +1,15 @@
-// 1. Configuración de tu PayPal
+/function addRSS() {
+    const name = document.getElementById('rss-name').value;
+    const url = document.getElementById('rss-url').value;
+    if(name && url) {
+        rssList.push({title: name, url: url});
+        renderRSS();
+        document.getElementById('rss-name').value = '';
+        document.getElementById('rss-url').value = '';
+    }
+}
+
+/ 1. Configuración de tu PayPal
 function irAPayPal() {
     // Esto fuerza a que se abra en el navegador externo
     window.open("https://www.paypal.com/paypalme/texiduvi", '_blank');
