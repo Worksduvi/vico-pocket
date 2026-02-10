@@ -480,22 +480,23 @@ function createNewButton() {
 
 function renderCustomButtons() {
     const container = document.getElementById('links-list');
-    container.innerHTML = ''; // Limpia para no duplicar
+    container.innerHTML = ''; 
 
     customButtons.forEach((btn, index) => {
-        const foto = getFavicon(btn.url);
-        const titulo = btn.label || getSlug(btn.url);
-
+        // Usamos el favicon grande como imagen previa
+        const foto = btn.favicon || getFavicon(btn.url);
+        
         container.insertAdjacentHTML('beforeend', `
-            <div class="glass p-4 rounded-2xl flex items-center gap-3 border border-white/10 mb-3">
-                <img src="${foto}" class="w-6 h-6 rounded-md">
+            <div class="glass p-4 rounded-2xl flex items-center gap-4 border border-white/10 mb-3 shadow-xl">
+                <img src="${foto}" class="w-12 h-12 rounded-xl object-cover bg-white/10">
                 <div class="flex-1 cursor-pointer" onclick="window.open('${btn.url}', '_self')">
-                    <h4 class="text-[11px] font-bold text-blue-400 uppercase">${titulo}</h4>
-                    <p class="text-[9px] opacity-60">Noticia y análisis disponible</p>
+                    <h4 class="text-[11px] font-bold text-blue-400 uppercase leading-tight">${btn.label}</h4>
+                    <p class="text-[9px] opacity-60 mt-1 line-clamp-1">${btn.url}</p>
+                    <p class="text-[8px] text-purple-300 mt-1 italic">${btn.excerpt || 'Análisis disponible'}</p>
                 </div>
-                <div class="flex gap-1">
-                    <button onclick="shareItem('${titulo}', '${btn.url}')" class="text-blue-400 p-2"><i class="fa-solid fa-share-nodes"></i></button>
-                    <button onclick="deleteCustomBtn(${index})" class="text-red-500 p-2"><i class="fa-solid fa-trash-can"></i></button>
+                <div class="flex flex-col gap-2">
+                    <button onclick="shareItem('${btn.label}', '${btn.url}')" class="text-blue-400 p-1"><i class="fa-solid fa-share-nodes"></i></button>
+                    <button onclick="deleteCustomBtn(${index})" class="text-red-500 p-1"><i class="fa-solid fa-trash-can"></i></button>
                 </div>
             </div>`);
     });
