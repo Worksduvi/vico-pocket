@@ -6,6 +6,7 @@
     <title>VICO POCKET ELITE v8
     
     </title>
+    <link rel="stylesheet" href="styles.css"> 
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,6 +25,7 @@
         .tab-active { color: var(--vacc); border-bottom: 2px solid var(--vacc); opacity: 1 !important; }
         .chat-box { width: 320px; height: 450px; display: none; flex-direction: column; z-index: 9000; }
     </style>
+
 </head>
 <body class="p-4 pb-48">
 
@@ -55,6 +57,29 @@
     </nav>
 
     <main id="app-content">
+        
+        <section id="v-home" class="space-y-6">
+        <div class="glass p-4 rounded-3xl border border-blue-500/20">
+            <h3 class="text-[11px] font-black text-blue-400 mb-3 uppercase tracking-tighter">Resumen Inteligente</h3>
+            <div class="home-grid">
+                <div class="glass p-3 rounded-2xl">
+                    <span class="text-[9px] opacity-50 block">Últimas Notas</span>
+                    <span id="dash-notes-count" class="text-lg font-bold">0</span>
+                </div>
+                <div class="glass p-3 rounded-2xl">
+                    <span class="text-[9px] opacity-50 block">Links Guardados</span>
+                    <span id="dash-links-count" class="text-lg font-bold">0</span>
+                </div>
+            </div>
+        </div>
+        <div id="tech-discovery" class="space-y-3">
+            <h3 class="text-[11px] font-black text-purple-400 uppercase">Discovery: Tech & IA</h3>
+            <div class="glass p-4 rounded-2xl text-[10px] italic opacity-70">
+                Cargando noticias de última hora.../Loading News 
+            </div>
+        </div>
+        </section>
+        
         <section id="v-links" class="space-y-4">
             <div id="links-list" class="grid gap-3">
                 <div class="glass p-4 rounded-2xl flex justify-between items-center">
