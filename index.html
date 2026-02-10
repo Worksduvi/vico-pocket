@@ -560,6 +560,49 @@ async function fetchDiscoveryNews() {
         container.innerHTML = '<p class="text-[9px] opacity-40 p-4">Conecta a Internet para ver Discovery...</p>';
     }
 }
+// --- MOTOR DE DISCOVERY (NOTICIAS REALES) ---
+async function fetchDiscoveryNews() {
+    const container = document.getElementById('tech-discovery');
+    // Usamos una lista de feeds RSS de tecnología y salud
+    const feeds = [
+        'https://www.wired.com/feed/rss',
+        'https://www.technologyreview.com/feed/',
+        'https://search.cnbc.com/rs/search/view.xml?partnerId=2000&keywords=health'
+    ];
+    
+    // Elegimos uno al azar cada vez que entras o recargas
+    const randomFeed = feeds[Math.floor(Math.random() * feeds.length)];
+    
+    try {
+        // Servicio gratuito para convertir RSS a JSON y evitar bloqueos de red
+        const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(randomFeed)}`);
+        const data = await response.json();
+        
+        if(data.items && data.items.length > 0) {
+            let html = '<h3 class="text-[11px] font-black text-purple-400 uppercase mb-3">Discovery: Tech, IA & Salud</h3>';
+            
+            // Mostramos las 4 noticias más recientes
+            data.items.slice(0, 4).forEach(item => {
+                const thumb = item.thumbnail || getFavicon(item.link);
+                html += `
+                <div class="glass p-3 rounded-2xl mb-3 border border-white/5 flex gap-3 items-center" onclick="window.open('${item.link}', '_blank')">
+                    <img src="${thumb}" class="w-10 h-10 rounded-lg object-cover">
+                    <div class="flex-1">
+                        <h4 class="text-[10px] font-bold text-white leading-tight">${item.title}</h4>
+                        <p class="text-[8px] opacity-50 mt-1 uppercase">${data.feed.title || 'Noticia'}</p>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+    } catch (e) {
+        container.innerHTML = `
+            <div class="p-4 text-center opacity-40">
+                <i class="fa-solid fa-wifi-slash mb-2 block"></i>
+                <p class="text-[9px]">Conecta a Internet para ver Discovery...</p>
+            </div>`;
+    }
+}
 
  </script>
     <footer class="mt-10 mb-20 text-center px-4">
