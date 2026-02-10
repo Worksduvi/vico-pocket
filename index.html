@@ -470,7 +470,7 @@ async function sendChatIA() {
         if (success) break;
 
         try {
-            const urlIA = `https://generativelanguage.googleapis.com/v1/models/${modelo}:generateContent?key=${userKey}`;
+            const urlIA = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${userKey}`;
             
             const response = await fetch(urlIA, {
                 method: 'POST',
