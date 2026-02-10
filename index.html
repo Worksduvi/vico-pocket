@@ -304,10 +304,25 @@ setTimeout(injectManualInput, 500);
 
         // CORE UI
         function switchTab(tab) {
-            ['links', 'notes', 'rss', 'data'].forEach(t => { document.getElementById(`v-${t}`).classList.add('hidden'); document.getElementById(`btn-${t}`).classList.replace('tab-active', 'opacity-40'); });
-            document.getElementById(`v-${tab}`).classList.remove('hidden'); document.getElementById(`btn-${tab}`).classList.add('tab-active'); document.getElementById(`btn-${tab}`).classList.remove('opacity-40');
-            playUX('click');
-        }
+    // Hemos añadido 'home' a la lista para que la App sepa ocultar/mostrar el Dashboard
+    ['home', 'links', 'notes', 'rss', 'data'].forEach(t => { 
+        const view = document.getElementById(`v-${t}`);
+        const btn = document.getElementById(`btn-${t}`);
+        if(view) view.classList.add('hidden');
+        if(btn) btn.classList.replace('tab-active', 'opacity-40');
+    });
+    
+    // Mostramos la pestaña que elegiste
+    document.getElementById(`v-${tab}`).classList.remove('hidden');
+    document.getElementById(`btn-${tab}`).classList.add('tab-active');
+    document.getElementById(`btn-${tab}`).classList.remove('opacity-40');
+    
+    // Si entramos a Home, refrescamos los números del Dashboard
+    if(tab === 'home') renderDashboard();
+    
+    playUX('click');
+}
+
         function openProfile() { document.getElementById('profile-modal').style.display = 'block'; playUX('click'); }
         function closeProfile() { document.getElementById('profile-modal').style.display = 'none'; }
         function toggleElement(id) { const el = document.getElementById(id); el.style.display = (el.style.display === 'flex') ? 'none' : 'flex'; playUX('click'); }
@@ -472,6 +487,78 @@ function deleteCustomBtn(index) {
     customButtons.splice(index, 1);
     localStorage.setItem('vico_custom_btns', JSON.stringify(customButtons));
     renderCustomButtons();
+}
+// --- MEJORAS DE PERSISTENCIA Y STATUS ---
+
+// 1. Al cargar la App: Recupera la API y actualiza el Dashboard
+window.addEventListener('DOMContentLoaded', () => {
+    const savedKey = localStorage.getItem('vico_api_key');
+    if(savedKey) {
+        const inputKey = document.getElementById('api-key-input');
+        if(inputKey) inputKey.value = savedKey;
+        updateApiStatus(true);
+    }
+    renderDashboard();
+    fetchDiscoveryNews(); // Llama a las noticias al iniciar
+});
+
+// 2. Notificación de conexión parpadeante (Ajustes)
+function updateApiStatus(connected) {
+    const btn = document.querySelector('button[onclick="saveSettings()"]');
+    if(btn && connected) {
+        btn.classList.add('api-connected');
+        btn.innerHTML = '<i class="fa-solid fa-brain"></i> CEREBRO CONECTADO';
+    }
+}
+
+// 3. Mensaje de bienvenida en el Chat (Sustituye a la anterior)
+function toggleElement(id) {
+    const el = document.getElementById(id);
+    const isOpen = el.style.display === 'flex';
+    el.style.display = isOpen ? 'none' : 'flex';
+    
+    if(!isOpen && id === 'ai-chat-container') {
+        const chatContent = document.getElementById('chat-content');
+        if(chatContent && chatContent.children.length === 0) {
+            chatContent.innerHTML = `<p class="bg-blue-600/10 p-2 rounded-xl text-[10px] italic text-blue-300">
+                Hola Admin AndyJavico. VICO POCKET ELITE está listo. ¿Qué analizamos hoy?
+            </p>`;
+        }
+    }
+    playUX('click');
+}
+
+// 4. Dashboard Logic: Actualiza los contadores de Home
+function renderDashboard() {
+    const dashNotes = document.getElementById('dash-notes-count');
+    const dashLinks = document.getElementById('dash-links-count');
+    
+    if(dashNotes) dashNotes.innerText = notes.length;
+    if(dashLinks) dashLinks.innerText = customButtons.length;
+}
+
+// 5. Discovery News (Sin API, vía Feed Público)
+async function fetchDiscoveryNews() {
+    const container = document.getElementById('tech-discovery');
+    try {
+        // Usamos un servicio gratuito que convierte RSS a JSON para evitar el bloqueo de Internet
+        const response = await fetch('https://api.rss2json.com/v1/api.json?rss_url=https://www.wired.com/feed/rss');
+        const data = await response.json();
+        
+        if(data.items) {
+            let html = '<h3 class="text-[11px] font-black text-purple-400 uppercase mb-3">Discovery: Tech & IA</h3>';
+            data.items.slice(0, 3).forEach(item => {
+                html += `
+                <div class="glass p-3 rounded-2xl mb-2 border border-white/5" onclick="window.open('${item.link}', '_blank')">
+                    <h4 class="text-[10px] font-bold text-white">${item.title}</h4>
+                    <p class="text-[9px] opacity-50 line-clamp-2">${item.description.replace(/<[^>]*>?/gm, '')}</p>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+    } catch (e) {
+        container.innerHTML = '<p class="text-[9px] opacity-40 p-4">Conecta a Internet para ver Discovery...</p>';
+    }
 }
 
  </script>
