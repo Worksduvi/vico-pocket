@@ -679,6 +679,24 @@ const draft = localStorage.getItem('vico_note_draft');
 if(draft && document.getElementById('note-input')) {
     document.getElementById('note-input').value = draft;
 }
+// --- TOQUE FINAL: PROMPT DE INSTALACIÓN ---
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Puedes mostrar un botón de "Instalar App" en Ajustes si quieres
+    console.log("VICO listo para ser instalado en Android");
+});
+
+// Limpieza automática: Si la App se queda colgada, esto refresca la memoria
+function clearVicoCache() {
+    if ('serviceWorker' in navigator) {
+        caches.keys().then(names => {
+            for (let name of names) caches.delete(name);
+        });
+        location.reload();
+    }
+}
 
  </script>
     <footer class="mt-10 mb-20 text-center px-4">
