@@ -1,11 +1,11 @@
 {
   "name": "VICO POCKET ELITE",
-  "short_name": "VICO ELITE",
+  "short_name": "VICO POCKET",
   "start_url": "./index.html",
   "display": "standalone",
-  "display_override": ["window-controls-overlay"],
   "background_color": "#0b0f1a",
   "theme_color": "#0b0f1a",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "icon.png",
