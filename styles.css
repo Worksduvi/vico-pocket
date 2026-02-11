@@ -113,3 +113,21 @@ button, input, select, textarea {
 
 /* Forzar que el modal-open bloquee el scroll del fondo */
 body.modal-open { overflow: hidden; }
+/* Asegura que los formularios de Notas y Feed estén siempre al frente */
+#v-notes, #v-rss {
+    padding-bottom: 180px !important;
+}
+
+#v-notes button, #v-rss button {
+    z-index: 50 !important;
+    position: relative;
+    pointer-events: auto !important;
+}
+
+/* Fix para que el selector de carpetas sea visible siempre */
+#folder-target {
+    background: #1a1e2e !important;
+    color: white !important;
+    display: block !important;
+    min-width: 120px;
+}
