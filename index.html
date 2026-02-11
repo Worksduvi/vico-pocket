@@ -17,20 +17,21 @@
         header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .vico-brand { font-weight: 900; font-style: italic; color: var(--vacc); font-size: 1.4rem; }
 
-        /* Imágenes centradas y contenidas */
+        /* Imágenes Pocket Style centradas */
         .keep-card img { width: 55%; height: auto; margin: 15px auto; display: block; border-radius: 12px; background: #161b22; object-fit: contain; }
 
         /* Chat Blindado con Z-Index Máximo */
         .chat-box { width: 92%; max-width: 350px; height: 500px; position: fixed; bottom: 110px; right: 4%; display: none; flex-direction: column; z-index: 99999 !important; background: rgba(11, 15, 26, 0.98); backdrop-filter: blur(20px); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 24px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .chat-box button, .chat-box input { pointer-events: auto !important; }
+        .chat-box button, .chat-box input { pointer-events: auto !important; cursor: pointer; }
 
         /* Notas: Vista previa 2 líneas */
-        .note-card { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; border-left: 4px solid var(--vacc); cursor: pointer; }
+        .note-card { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; border-left: 4px solid var(--vacc); cursor: pointer; margin-bottom: 10px; }
         .note-preview { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 11px; opacity: 0.7; }
         .note-full { display: none; font-size: 11px; margin-top: 10px; line-height: 1.5; }
         .note-card.expanded .note-preview { display: none; }
         .note-card.expanded .note-full { display: block; }
 
+        /* Pestañas Carpetas */
         .folder-tabs { display: flex; gap: 8px; overflow-x: auto; padding: 10px 0; }
         .folder-tab { background: rgba(255,255,255,0.05); padding: 6px 14px; border-radius: 20px; font-size: 10px; white-space: nowrap; cursor: pointer; border: 1px solid transparent; }
         .folder-tab.active { background: var(--vacc); color: white; border-color: white; }
@@ -38,12 +39,18 @@
         /* Modales */
         .modal-full { position: fixed; inset: 0; background: #0b0f1a; z-index: 999999 !important; padding: 2rem; overflow-y: auto; display: none; }
         
+        /* Notificación Guardado */
+        #save-confirm { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #22c55e; color: white; padding: 10px 25px; border-radius: 30px; display: none; z-index: 100000; animation: blink 1.5s infinite; font-weight: bold; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
         /* Temas */
         .gold-grad { background: linear-gradient(135deg, #0f0c08, #262112) !important; }
         .cyber-grad { background: linear-gradient(135deg, #000428, #004e92) !important; }
     </style>
 </head>
 <body class="p-4">
+
+    <div id="save-confirm"><i class="fa-solid fa-check-circle"></i> GUARDADO</div>
 
     <header class="fixed top-0 left-0 w-full glass z-[5000]">
         <div class="vico-brand">VICO POCKET <span class="text-[10px] border border-blue-500 px-1 italic">ELITE</span></div>
@@ -58,7 +65,7 @@
         <button onclick="switchTab('links')" id="btn-links" class="opacity-40">Links🔗</button>
         <button onclick="switchTab('notes')" id="btn-notes" class="opacity-40">Notas📝</button>
         <button onclick="switchTab('data')" id="btn-data" class="opacity-40">Análisis🪄</button>
-        <button onclick="switchTab('calendar')" id="btn-calendar" class="opacity-40">Eventos📅</button>
+        <button onclick="switchTab('calendar')" id="btn-calendar" class="opacity-40">📅</button>
     </nav>
 
     <main id="app-content" class="mt-4">
@@ -66,10 +73,10 @@
             <div id="top-phrase" class="glass p-5 rounded-[2rem] mb-6 text-[11px] italic text-blue-300 text-center border-l-4 border-blue-500 shadow-lg"></div>
             <div class="flex justify-between items-center mb-4">
                 <select id="news-cat" onchange="fetchDiscovery()" class="bg-white/5 text-[10px] p-2 rounded-xl outline-none border border-white/10">
-                    <option value="ai">AI & Futurismo</option>
+                    <option value="ai">AI / IA & Futurismo</option>
                     <option value="tech">Nvidia/Google/MS</option>
-                    <option value="finance">Finanzas & Crypto</option>
-                    <option value="science">Ciencia Pro</option>
+                    <option value="finance">Economía & Finanzas</option>
+                    <option value="science">Ciencia & Inventos</option>
                 </select>
                 <button onclick="fetchDiscovery()" class="bg-blue-600/20 text-blue-400 px-4 py-2 rounded-xl text-[10px] font-bold">REFRESCAR</button>
             </div>
@@ -78,8 +85,8 @@
 
         <section id="v-links" class="hidden">
             <div class="glass p-4 rounded-3xl mb-6 border border-white/10">
-                <input type="text" id="manual-url" placeholder="Pega una URL aquí..." class="w-full bg-white/5 p-3 rounded-xl text-xs outline-none mb-3">
-                <button onclick="addManualLink()" class="w-full bg-blue-600 py-3 rounded-xl text-[10px] font-black uppercase">Añadir Link Manual</button>
+                <input type="text" id="manual-url" placeholder="Añadir URL manualmente..." class="w-full bg-white/5 p-3 rounded-xl text-xs outline-none mb-3">
+                <button onclick="addManualLink()" class="w-full bg-blue-600 py-3 rounded-xl text-[10px] font-black uppercase">Añadir Link</button>
             </div>
             <div id="links-list" class="grid gap-4"></div>
         </section>
@@ -88,10 +95,10 @@
             <div id="folder-tabs" class="folder-tabs mb-4"></div>
             <div class="glass p-4 rounded-3xl mb-6">
                 <div class="flex gap-2 mb-3">
-                    <input type="text" id="folder-input" placeholder="Nombre carpeta..." class="flex-1 bg-white/5 p-2 rounded-xl text-xs outline-none border border-white/10">
+                    <input type="text" id="folder-input" placeholder="Nueva carpeta..." class="flex-1 bg-white/5 p-2 rounded-xl text-xs outline-none border border-white/10">
                     <button onclick="createFolder()" class="bg-blue-600/20 text-blue-400 px-4 rounded-xl text-[9px] font-bold uppercase">Crear</button>
                 </div>
-                <textarea id="note-input" class="w-full bg-transparent text-xs h-24 outline-none border-b border-white/5" placeholder="Escribe tu idea..."></textarea>
+                <textarea id="note-input" class="w-full bg-transparent text-xs h-24 outline-none border-b border-white/5" placeholder="Tu idea..."></textarea>
                 <div class="flex justify-between mt-4">
                     <select id="folder-target" class="bg-black/60 text-[10px] p-2 rounded-xl border border-white/10"></select>
                     <button onclick="saveNote()" class="bg-blue-600 px-8 py-2 rounded-xl text-xs font-bold uppercase">Guardar</button>
@@ -102,26 +109,36 @@
 
         <section id="v-data" class="hidden">
             <div class="glass p-5 rounded-[2rem] border border-purple-500/20 mb-6">
-                <input type="text" id="ai-prompt" placeholder="Impacto de la IA en 2026..." class="w-full bg-white/5 p-3 rounded-2xl text-xs mb-4 outline-none">
-                <button onclick="runAnalysisIA()" class="w-full bg-purple-600 py-4 rounded-2xl text-xs font-black uppercase shadow-lg shadow-purple-900/40">Generar Informe Maestro</button>
+                <input type="text" id="ai-prompt" placeholder="Analiza mercado de oro 2026..." class="w-full bg-white/5 p-3 rounded-2xl text-xs mb-4 outline-none">
+                <button onclick="runAnalysisIA()" class="w-full bg-purple-600 py-4 rounded-2xl text-xs font-black uppercase shadow-lg shadow-purple-900/40">Generar Informe</button>
             </div>
             <div class="chart-container glass p-4 rounded-3xl mb-6">
                 <canvas id="chartDoughnut"></canvas>
                 <div id="chart-center-text" style="position:absolute; top:55%; left:50%; transform:translate(-50%, -50%); text-align:center; font-size:10px; font-weight:bold; color:#3b82f6; pointer-events:none;"></div>
             </div>
-            <div id="ai-report" class="glass p-6 rounded-3xl text-[11px] hidden border-l-8 border-purple-500 shadow-2xl"></div>
+            <div id="ai-report" class="glass p-6 rounded-3xl text-[11px] hidden border-l-8 border-purple-500"></div>
+        </section>
+
+        <section id="v-calendar" class="hidden">
+            <div class="glass p-6 rounded-[2rem] border border-blue-500/20 shadow-xl text-center">
+                <h3 class="text-xs font-black mb-4 uppercase text-blue-400">Notificaciones Nativas</h3>
+                <input type="date" id="cal-date" class="w-full bg-white/5 p-3 rounded-xl mb-3 outline-none border border-white/10">
+                <input type="text" id="cal-text" placeholder="¿Qué agendamos?" class="w-full bg-white/5 p-3 rounded-xl mb-4 text-xs outline-none border border-white/10">
+                <button onclick="addReminder()" class="w-full bg-blue-600 py-4 rounded-2xl font-black uppercase text-[10px]">Añadir Evento</button>
+            </div>
+            <div id="notif-list" class="mt-8 space-y-3"></div>
         </section>
     </main>
 
     <div id="ai-chat-container" class="chat-box glass shadow-2xl">
         <div class="bg-blue-600 p-2 flex justify-around">
-            <button onclick="setChatMode('libre')" id="mode-libre" class="text-[8px] font-bold uppercase px-4 py-1 rounded-full bg-white/20">Modo Libre</button>
-            <button onclick="setChatMode('pro')" id="mode-pro" class="text-[8px] font-bold uppercase px-4 py-1 rounded-full opacity-50">Modo Pro</button>
+            <button onclick="setChatMode('libre')" id="mode-libre" class="text-[8px] font-bold uppercase px-4 py-1 rounded-full bg-white/20">Libre</button>
+            <button onclick="setChatMode('pro')" id="mode-pro" class="text-[8px] font-bold uppercase px-4 py-1 rounded-full opacity-50">Pro</button>
         </div>
         <div id="chat-content" class="flex-1 p-3 overflow-y-auto text-[10px] space-y-2"></div>
         <div class="p-2 border-t border-white/10 flex gap-2">
-            <input type="text" id="chat-msg" class="flex-1 bg-black/40 p-2 rounded-xl text-[10px] outline-none" placeholder="Pregunta a VICO...">
-            <button onclick="sendChatIA()" class="bg-blue-600 px-3 rounded-xl"><i class="fa-solid fa-paper-plane"></i></button>
+            <input type="text" id="chat-msg" class="flex-1 bg-black/40 p-2 rounded-xl text-[10px] outline-none" placeholder="Habla con VICO...">
+            <button onclick="sendChatIA()" class="bg-blue-600 px-3 rounded-xl shadow-lg"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
 
@@ -134,12 +151,12 @@
 
     <div id="profile-modal" class="modal-full">
         <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-black text-blue-500 uppercase">Configuración</h2>
+            <h2 class="text-2xl font-black text-blue-500 uppercase italic">Configuración</h2>
             <button onclick="closeProfile()" class="text-4xl">&times;</button>
         </div>
         <div class="space-y-6">
             <div class="glass p-5 rounded-3xl border-l-4 border-yellow-500 shadow-xl">
-                <input type="password" id="api-key-input" placeholder="API Key Groq/Gemini..." class="w-full bg-black/60 p-4 rounded-xl text-xs border border-white/10 mb-4 outline-none">
+                <input type="password" id="api-key-input" placeholder="API Key Groq/Gemini..." class="w-full bg-black/60 p-4 rounded-xl text-xs border border-white/10 mb-4">
                 <div class="flex justify-between items-center glass p-3 rounded-xl mb-4">
                     <span class="text-[10px] font-bold">SONIDOS UX</span>
                     <input type="checkbox" id="sound-toggle" checked>
@@ -148,14 +165,14 @@
                     <button onclick="changeTheme('gold')" class="p-3 rounded-xl text-[9px] font-black uppercase" style="background:linear-gradient(135deg,#bf953f,#fcf6ba,#b38728); color:black;">Gold</button>
                     <button onclick="changeTheme('cyber')" class="p-3 rounded-xl text-[9px] font-black uppercase" style="background:linear-gradient(135deg,#2d00f7,#ff00bd); color:white;">Cyber</button>
                 </div>
-                <button onclick="saveSettings()" class="w-full bg-blue-600 py-3 rounded-xl font-bold uppercase text-[10px]">Sincronizar Cerebro</button>
+                <button onclick="saveSettings()" class="w-full bg-blue-600 py-3 rounded-xl font-bold uppercase text-[10px]">Sincronizar</button>
             </div>
             <button onclick="window.open('https://www.paypal.me/texiduvi')" class="w-full bg-yellow-500 text-black py-5 rounded-[2rem] font-black uppercase shadow-xl flex items-center justify-center gap-3">
                 <i class="fa-brands fa-paypal"></i> Invitar un Café ☕
             </button>
             <div class="text-center py-6 opacity-30">
                 <p class="text-[9px] uppercase font-bold">AndyJavico © 2026</p>
-                <a href="https://linkedin.com/in/andyjavico" target="_blank" class="text-3xl mt-2 block text-blue-400"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="https://linkedin.com/in/andyjavico" target="_blank" class="text-2xl mt-2 block text-blue-400"><i class="fa-brands fa-linkedin"></i></a>
             </div>
         </div>
     </div>
@@ -164,12 +181,16 @@
         let notes = JSON.parse(localStorage.getItem('vico_notes')) || [];
         let folders = JSON.parse(localStorage.getItem('vico_folders')) || ['General', 'Estrategia', 'IA'];
         let customButtons = JSON.parse(localStorage.getItem('vico_custom_btns')) || [];
+        let reminders = JSON.parse(localStorage.getItem('vico_reminders')) || [];
         let currentFolder = 'General';
         let chatMode = 'pro';
         let charts = {};
 
+        const FRASES = ["La innovación diferencia a un líder de un seguidor. - S. Jobs", "La mejor forma de predecir el futuro es crearlo. - P. Drucker", "Hazlo simple, pero significativo. - Don Draper"];
+
         window.onload = () => {
-            fetchDiscovery(); renderFolders(); renderDashboard();
+            document.getElementById('top-phrase').innerText = FRASES[Math.floor(Math.random()*FRASES.length)];
+            fetchDiscovery(); renderFolders(); renderDashboard(); renderReminders();
             if(localStorage.getItem('vico_api_key')) document.getElementById('api-key-input').value = localStorage.getItem('vico_api_key');
         };
 
@@ -179,66 +200,60 @@
             if(t === 'notes') renderFolders();
         }
 
-        // DISCOVERY PRO + TTS
+        // DISCOVERY DINÁMICO + TTS + GUARDAR
         async function fetchDiscovery() {
             const cat = document.getElementById('news-cat').value;
             const container = document.getElementById('discovery-list');
-            container.innerHTML = "<p class='animate-pulse text-center py-10 uppercase text-[9px]'>VICO Sincronizando...</p>";
-            
-            const feeds = {
-                ai: 'https://www.wired.com/feed/tag/ai/latest/rss',
-                tech: 'https://www.xataka.com/feed/full',
-                finance: 'https://www.eleconomista.es/rss/rss-economia.php'
-            };
-
+            container.innerHTML = "<p class='animate-pulse text-center py-10 uppercase text-[9px]'>VICO Sincronizando fuentes...</p>";
+            const feeds = { ai: 'https://www.wired.com/feed/tag/ai/latest/rss', tech: 'https://www.xataka.com/feed/full', finance: 'https://www.eleconomista.es/rss/rss-economia.php' };
             try {
                 const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feeds[cat] || feeds.ai)}`);
                 const data = await res.json();
                 container.innerHTML = data.items.slice(0, 10).map(item => `
-                    <div class="keep-card glass p-4 rounded-[2rem] border border-white/5 relative">
+                    <div class="keep-card glass p-4 rounded-[2rem] border border-white/5">
                         <img src="${item.thumbnail || 'icon.png'}" onerror="this.src='icon.png'">
                         <h4 class="text-[11px] font-black uppercase mb-3 text-blue-300 leading-tight">${item.title}</h4>
                         <div class="flex gap-2">
-                            <button onclick="window.open('${item.link}')" class="flex-1 bg-blue-600/20 text-blue-400 py-3 rounded-2xl text-[8px] font-black uppercase">Leer más</button>
+                            <button onclick="window.open('${item.link}')" class="flex-1 bg-blue-600/20 text-blue-400 py-3 rounded-2xl text-[8px] font-black uppercase">Leer</button>
                             <button onclick="speak('${item.title.replace(/'/g,"")}')" class="bg-white/5 px-4 rounded-2xl"><i class="fa-solid fa-volume-high"></i></button>
                             <button onclick="saveLinkToVico('${item.title.replace(/'/g,"")}', '${item.link}')" class="bg-purple-600/20 text-purple-400 px-4 rounded-2xl"><i class="fa-solid fa-bookmark"></i></button>
                         </div>
                     </div>`).join('');
-            } catch(e) { container.innerHTML = "Error de red."; }
+            } catch(e) { container.innerHTML = "Error de conexión."; }
         }
 
-        function speak(t) {
-            const utterance = new SpeechSynthesisUtterance(t);
-            utterance.lang = 'es-ES'; window.speechSynthesis.speak(utterance);
-        }
+        function speak(t) { const u = new SpeechSynthesisUtterance(t); u.lang = 'es-ES'; window.speechSynthesis.speak(u); }
 
         // NOTAS EXPANDIBLES
-        function createFolder() {
-            const v = document.getElementById('folder-input').value.trim();
-            if(v && !folders.includes(v)) { folders.push(v); localStorage.setItem('vico_folders', JSON.stringify(folders)); renderFolders(); document.getElementById('folder-input').value=''; }
-        }
+        function createFolder() { const v = document.getElementById('folder-input').value.trim(); if(v && !folders.includes(v)) { folders.push(v); localStorage.setItem('vico_folders', JSON.stringify(folders)); renderFolders(); document.getElementById('folder-input').value=''; } }
         function renderFolders() {
             document.getElementById('folder-tabs').innerHTML = folders.map(f => `<div onclick="currentFolder='${f}';renderFolders();renderNotes()" class="folder-tab ${currentFolder===f?'active':''}">${f}</div>`).join('');
             document.getElementById('folder-target').innerHTML = folders.map(f => `<option value="${f}">${f}</option>`).join('');
         }
-        function saveNote() {
-            const b = document.getElementById('note-input').value, f = document.getElementById('folder-target').value;
-            if(b) { notes.unshift({ body: b, folder: f, date: new Date().toLocaleDateString(), id: Date.now() }); localStorage.setItem('vico_notes', JSON.stringify(notes)); document.getElementById('note-input').value=''; renderNotes(); renderDashboard(); }
-        }
+        function saveNote() { const b = document.getElementById('note-input').value, f = document.getElementById('folder-target').value; if(b) { notes.unshift({ body: b, folder: f, date: new Date().toLocaleDateString(), id: Date.now() }); localStorage.setItem('vico_notes', JSON.stringify(notes)); document.getElementById('note-input').value=''; renderNotes(); renderDashboard(); } }
         function renderNotes() {
             document.getElementById('notes-grid').innerHTML = notes.filter(n => n.folder === currentFolder).map(n => `
                 <div class="note-card" onclick="this.classList.toggle('expanded')">
                     <div class="flex justify-between items-center mb-1"><span class="text-[7px] opacity-40 uppercase">${n.date}</span><button onclick="deleteNote(${n.id})" class="text-red-500 text-[8px]"><i class="fa-solid fa-trash"></i></button></div>
-                    <div class="note-preview">${n.body}</div>
-                    <div class="note-full">${n.body}</div>
+                    <div class="note-preview">${n.body}</div><div class="note-full">${n.body}</div>
                 </div>`).join('');
         }
         function deleteNote(id) { notes = notes.filter(n => n.id !== id); localStorage.setItem('vico_notes', JSON.stringify(notes)); renderNotes(); renderDashboard(); }
 
-        // CHAT IA
+        // CALENDARIO NATIVO
+        function addReminder() {
+            const d = document.getElementById('cal-date').value, t = document.getElementById('cal-text').value;
+            if(d && t) {
+                reminders.unshift({ date: d, text: t, id: Date.now() }); localStorage.setItem('vico_reminders', JSON.stringify(reminders));
+                renderReminders(); if ("Notification" in window && Notification.permission === "granted") { new Notification("VICO: Recordatorio", { body: t }); } else { Notification.requestPermission(); }
+                alert("Evento guardado!");
+            }
+        }
+        function renderReminders() { document.getElementById('notif-list').innerHTML = reminders.map(r => `<div class="glass p-4 rounded-xl border-l-4 border-green-500 text-[10px] flex justify-between items-center"><div><b class="text-blue-400">${r.date}</b><br>${r.text}</div><button onclick="reminders=reminders.filter(x=>x.id!==r.id);renderReminders();localStorage.setItem('vico_reminders',JSON.stringify(reminders))" class="text-red-500"><i class="fa-solid fa-trash"></i></button></div>`).join(''); }
+
+        // CHAT VICO FLOTANTE
         function toggleElement(id) { const el = document.getElementById(id); el.style.display = (el.style.display === 'flex') ? 'none' : 'flex'; }
         function setChatMode(m) { chatMode = m; document.getElementById('mode-libre').classList.toggle('opacity-50', m==='pro'); document.getElementById('mode-pro').classList.toggle('opacity-50', m==='libre'); }
-
         async function sendChatIA() {
             const input = document.getElementById('chat-msg'), key = localStorage.getItem('vico_api_key');
             if(!input.value || !key) return;
@@ -254,28 +269,8 @@
             } catch (e) { alert("Error API. Sincroniza Key."); }
         }
 
-        // ANÁLISIS ESTRATÉGICO
-        async function runAnalysisIA() {
-            const p = document.getElementById('ai-prompt').value, key = localStorage.getItem('vico_api_key');
-            if(!p || !key) return;
-            const rep = document.getElementById('ai-report'); rep.classList.remove('hidden'); rep.innerHTML = "Analizando Inteligencia...";
-            const cmd = `Analiza: "${p}". Responde solo JSON: {"labels":["Asia","Europa","USA"],"data":[40,30,30],"excel":{"zona":"Global","crecimiento":"+15%","roi":"22%"},"analisis":"Resumen detallado..."}`;
-            try {
-                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`}, body:JSON.stringify({model:"llama-3.3-70b-versatile", messages:[{role:"user",content:cmd}]}) });
-                const d = await res.json();
-                const dataIA = JSON.parse(d.choices[0].message.content.replace(/```json|```/g, ''));
-                updateCharts(dataIA);
-                rep.innerHTML = dataIA.analisis;
-                document.getElementById('chart-center-text').innerHTML = `ROI ${dataIA.excel.roi}<br>${dataIA.excel.zona}`;
-            } catch(e) { rep.innerHTML = "Error JSON."; }
-        }
-
-        function updateCharts(d) {
-            if(charts.doughnut) charts.doughnut.destroy();
-            charts.doughnut = new Chart(document.getElementById('chartDoughnut'), { type:'doughnut', data:{labels:d.labels, datasets:[{data:d.data, backgroundColor:['#3b82f6','#8b5cf6','#ec4899']}]}, options:{cutout:'75%', plugins:{legend:{display:false}}} });
-        }
-
         // OTROS
+        function addManualLink() { const v = document.getElementById('manual-url').value; if(v) { saveLinkToVico("Link Manual", v); document.getElementById('manual-url').value=''; } }
         function saveLinkToVico(l, u) {
             const cleanUrl = u.includes('http') ? u : 'https://' + u;
             const fav = `https://www.google.com/s2/favicons?sz=128&domain=${new URL(cleanUrl).hostname}`;
@@ -283,16 +278,13 @@
             localStorage.setItem('vico_custom_btns', JSON.stringify(customButtons));
             renderCustomButtons(); renderDashboard();
         }
-        function addManualLink() { const v = document.getElementById('manual-url').value; if(v) { saveLinkToVico("Link Manual", v); document.getElementById('manual-url').value=''; } }
         function renderCustomButtons() {
             document.getElementById('links-list').innerHTML = customButtons.map((btn, i) => `
                 <div class="keep-card glass p-4 rounded-[2rem]">
                     <img src="${btn.favicon}" onerror="this.src='icon.png'">
                     <div class="text-center"><h4 class="text-[10px] font-black uppercase truncate text-blue-400 mb-2">${btn.label}</h4>
-                    <div class="flex justify-center gap-4">
-                        <button onclick="window.open('${btn.url}', '_self')" class="text-blue-400 text-[9px] uppercase font-bold">Abrir</button>
-                        <button onclick="customButtons.splice(${i},1);renderCustomButtons();localStorage.setItem('vico_custom_btns',JSON.stringify(customButtons));renderDashboard()" class="text-red-500 text-[9px] uppercase font-bold">Borrar</button>
-                    </div></div>
+                    <button onclick="window.open('${btn.url}', '_self')" class="bg-blue-600/20 px-4 py-1 rounded-xl text-[8px] font-black text-blue-400 uppercase">Abrir</button>
+                    <button onclick="customButtons.splice(${i},1);renderCustomButtons();renderDashboard()" class="text-red-500 text-[8px] font-black uppercase">Borrar</button></div>
                 </div>`).join('');
         }
         function renderDashboard() { document.getElementById('dash-notes-count').innerText = notes.length; document.getElementById('dash-links-count').innerText = customButtons.length; }
@@ -300,7 +292,7 @@
         function closeProfile() { document.getElementById('profile-modal').style.display='none'; }
         function toggleDark() { document.body.classList.toggle('light-mode'); }
         function changeTheme(t) { document.body.className = `p-4 ${t}-grad`; }
-        function saveSettings() { localStorage.setItem('vico_api_key', document.getElementById('api-key-input').value); alert("Sincronizado."); }
+        function saveSettings() { localStorage.setItem('vico_api_key', document.getElementById('api-key-input').value); alert("Sincronizado."); location.reload(); }
     </script>
 </body>
-                </html>
+                        </html> 
