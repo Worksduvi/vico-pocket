@@ -185,6 +185,30 @@
     </nav>
 
     <script>
+        // --- LÓGICA DE CAPTURA DE COMPARTIR ANDROID ---
+window.addEventListener('DOMContentLoaded', () => {
+    const parsedUrl = new URL(window.location);
+    // Android suele enviar el link en 'url' o en 'text'
+    const sharedTitle = parsedUrl.searchParams.get('title');
+    const sharedText = parsedUrl.searchParams.get('text');
+    const sharedUrl = parsedUrl.searchParams.get('url');
+
+    // Determinamos cuál es el link real
+    const linkFinal = sharedUrl || sharedText;
+
+    if (linkFinal) {
+        // Ejecutamos tu función de guardado
+        // He usado 'Link Externo' como etiqueta si no viene título
+        saveLinkToVico(sharedTitle || "Link Externo", linkFinal);
+
+        // LIMPIEZA: Borramos los parámetros de la URL para que si el usuario
+        // refresca la página, no se guarde el mismo link otra vez.
+        window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Opcional: Cambiar a la pestaña de links para que el usuario vea que se guardó
+        switchTab('links');
+    }
+});
         let notes = JSON.parse(localStorage.getItem('vico_notes')) || [];
         let customButtons = JSON.parse(localStorage.getItem('vico_custom_btns')) || [];
         let chatMode = 'pro'; // Por defecto profesional
