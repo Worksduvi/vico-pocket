@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vico-elite-v9.1';
+const CACHE_NAME = 'vico-pocket-v9.2';
 const ASSETS = ['./', './index.html', './manifest.json', './icon.png'];
 
 self.addEventListener('install', e => {
