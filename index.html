@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VICO POCKET ELITE v8.6</title>
+    <title>VICO POCKET ELITE v8.7</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,45 +14,32 @@
         body { background: var(--vbg); color: var(--vtxt); font-family: 'Inter', sans-serif; margin: 0; min-height: 100vh; overflow-x: hidden; transition: 0.3s; }
         body.light-mode { --vbg: #f8fafc; --vtxt: #0f172a; --vacc: #2563eb; }
         
-        /* FIX: Espacio para que el nav no tape botones */
         main { padding-bottom: 160px !important; position: relative; z-index: 1; }
         section { position: relative; z-index: 10; }
-        button, input, select, textarea { position: relative; z-index: 20; pointer-events: auto !important; }
-
-        /* Modal Configuración - FIX DESFASE FOOTER */
-        .modal-full { position: fixed; inset: 0; background: #0b0f1a; z-index: 999999 !important; padding: 2rem; overflow-y: auto; display: none; }
-        body.modal-open { overflow: hidden; height: 100vh; }
-
-        /* Chat corregido - FIX POSICIÓN DERECHA */
-        .chat-box { width: 92%; max-width: 350px; height: 500px; position: fixed; bottom: 110px; right: 4%; display: none; flex-direction: column; z-index: 9000; background: rgba(11, 15, 26, 0.98); backdrop-filter: blur(20px); border: 1px solid rgba(59, 130, 246, 0.3); box-shadow: 0 15px 50px rgba(0,0,0,0.8); border-radius: 24px; overflow: hidden; }
         
-        /* Pantalla de Carga */
-        #loading-screen { position: fixed; inset: 0; background: #0b0f1a; z-index: 100000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        /* FIX CHAT: Asegura que el botón enviar reciba el clic */
+        .chat-box { width: 92%; max-width: 350px; height: 500px; position: fixed; bottom: 110px; right: 4%; display: none; flex-direction: column; z-index: 99999 !important; background: rgba(11, 15, 26, 0.98); backdrop-filter: blur(20px); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 24px; overflow: hidden; }
+        .chat-box button, .chat-box input { pointer-events: auto !important; cursor: pointer; }
+
+        .modal-full { position: fixed; inset: 0; background: #0b0f1a; z-index: 999999 !important; padding: 2rem; overflow-y: auto; display: none; }
+        #loading-screen { position: fixed; inset: 0; background: #0b0f1a; z-index: 1000000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .loader-bar { width: 200px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-top: 20px; }
         .loader-progress { width: 0%; height: 100%; background: var(--vacc); transition: 0.3s; }
 
-        /* Estilo Keep para Links */
-        .keep-card { background: rgba(255,255,255,0.03); border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; margin-bottom: 16px; transition: 0.3s; }
+        .keep-card { background: rgba(255,255,255,0.03); border-radius: 18px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; margin-bottom: 16px; position: relative; }
         .keep-card img { width: 100%; height: 130px; object-fit: cover; background: #1a1e2e; }
-
         .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
-        .aura-btn { border: 1px solid var(--vacc); box-shadow: 0 0 10px var(--aura); transition: 0.3s; }
         .tab-active { color: var(--vacc); border-bottom: 2px solid var(--vacc); opacity: 1 !important; }
-        
-        /* Temas */
         .gold-grad { background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728) !important; color: black !important; }
         .cyber-grad { background: linear-gradient(135deg, #2d00f7, #ff00bd) !important; color: white !important; }
-
-        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
-        .api-connected { animation: pulse-green 2s infinite; border: 2px solid #22c55e !important; }
         .line-clamp-4 { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
     </style>
 </head>
 <body class="p-4">
 
     <div id="loading-screen">
-        <h1 class="text-3xl font-black italic text-blue-500 mb-2">VICO ELITE</h1>
-        <p id="load-text" class="text-[10px] text-gray-400 italic px-6 text-center"></p>
+        <h1 class="text-3xl font-black italic text-blue-500 mb-2 uppercase tracking-tighter">VICO Elite</h1>
+        <p id="load-text" class="text-[10px] text-gray-400 px-8 text-center italic"></p>
         <div class="loader-bar"><div id="prog-bar" class="loader-progress"></div></div>
     </div>
 
@@ -62,33 +49,36 @@
                 <span id="pomo-timer" class="text-xs font-mono text-red-400">25:00</span>
                 <button id="pomo-btn" onclick="pomoControl()" class="fa-solid fa-play text-[10px]"></button>
             </div>
-            <button onclick="toggleElement('ai-chat-container')" class="glass p-2 rounded-xl text-blue-400 aura-btn"><i class="fa-solid fa-robot"></i></button>
+            <button onclick="toggleElement('ai-chat-container')" class="glass p-2 rounded-xl text-blue-400 border border-blue-500/20"><i class="fa-solid fa-robot"></i></button>
         </div>
         <h1 class="text-lg font-black italic text-blue-500">VICO</h1>
     </div>
 
-    <nav class="mt-16 flex gap-4 mb-6 border-b border-white/10 text-[11px] font-black pb-2 overflow-x-auto uppercase">
+    <nav class="mt-16 flex gap-4 mb-6 border-b border-white/10 text-[10px] font-black pb-2 overflow-x-auto uppercase">
         <button onclick="switchTab('home')" id="btn-home" class="tab-active">Home🏡</button>
         <button onclick="switchTab('links')" id="btn-links" class="opacity-40">Links🔗</button>
         <button onclick="switchTab('notes')" id="btn-notes" class="opacity-40">Notas📝</button>
-        <button onclick="switchTab('rss')" id="btn-rss" class="opacity-40">RSS Feed📰</button>
-        <button onclick="switchTab('data')" id="btn-data" class="opacity-40 text-purple-400">Análisis🪄</button>
+        <button onclick="switchTab('rss')" id="btn-rss" class="opacity-40">RSS📰</button>
+        <button onclick="switchTab('data')" id="btn-data" class="opacity-40 text-purple-400 font-bold">Análisis🪄</button>
     </nav>
 
     <main id="app-content">
         <section id="v-home" class="space-y-6">
             <div class="grid grid-cols-2 gap-3">
-                <div class="glass p-4 rounded-2xl text-center"><span class="text-[9px] opacity-50 block uppercase">Notas</span><span id="dash-notes-count" class="text-xl font-bold">0</span></div>
-                <div class="glass p-4 rounded-2xl text-center"><span class="text-[9px] opacity-50 block uppercase">Links</span><span id="dash-links-count" class="text-xl font-bold">0</span></div>
+                <div class="glass p-4 rounded-2xl text-center"><span class="text-[8px] opacity-50 block uppercase mb-1">Notas</span><span id="dash-notes-count" class="text-xl font-bold">0</span></div>
+                <div class="glass p-4 rounded-2xl text-center"><span class="text-[8px] opacity-50 block uppercase mb-1">Links</span><span id="dash-links-count" class="text-xl font-bold">0</span></div>
             </div>
-            <div id="tech-discovery" class="space-y-4">
-                <h3 class="text-[11px] font-black text-purple-400 uppercase">Discovery: Tech & IA</h3>
+            
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="text-[10px] font-black text-purple-400 uppercase tracking-widest">Discovery Pro</h3>
+                <button onclick="fetchDiscoveryNews()" class="text-[9px] bg-white/5 px-3 py-1 rounded-full border border-white/10 uppercase font-bold text-blue-400"><i class="fa-solid fa-rotate mr-1"></i> Refrescar</button>
             </div>
+            <div id="tech-discovery" class="space-y-4"></div>
         </section>
 
         <section id="v-links" class="hidden space-y-4">
-            <div class="glass p-3 rounded-2xl mb-6 flex gap-2 border border-white/5">
-                <input type="text" id="manual-url" placeholder="Pega URL aquí..." class="flex-1 bg-white/5 p-2 rounded-xl text-[10px] outline-none">
+            <div class="glass p-3 rounded-2xl flex gap-2 border border-white/10">
+                <input type="text" id="manual-url" placeholder="Pega URL aquí..." class="flex-1 bg-white/5 p-2 rounded-xl text-xs outline-none">
                 <button onclick="addManualLink()" class="bg-blue-600 px-4 py-2 rounded-xl text-[10px] font-bold uppercase">Añadir</button>
             </div>
             <div id="links-list" class="grid gap-4"></div>
@@ -97,13 +87,13 @@
         <section id="v-notes" class="hidden space-y-4">
             <div class="glass p-4 rounded-3xl border border-blue-500/20">
                 <div class="flex gap-2 mb-3">
-                    <input type="text" id="folder-input" placeholder="Nueva Carpeta..." class="flex-1 bg-white/5 p-2 rounded-xl text-xs border border-white/10 outline-none">
+                    <input type="text" id="folder-input" placeholder="Nueva Carpeta..." class="flex-1 bg-white/5 p-2 rounded-xl text-xs outline-none">
                     <button onclick="createFolder()" class="bg-blue-600/30 text-blue-400 px-3 rounded-xl text-[9px] font-bold uppercase">Crear</button>
                 </div>
                 <textarea id="note-input" class="w-full bg-transparent text-xs h-24 outline-none mb-2" placeholder="Escribe tu idea..."></textarea>
                 <div class="flex justify-between items-center">
                     <select id="folder-target" class="bg-black/60 text-[10px] p-2 rounded-xl border border-white/10"></select>
-                    <button onclick="saveNote()" class="bg-blue-600 px-6 py-2 rounded-xl text-xs font-bold uppercase">Guardar</button>
+                    <button onclick="saveNote()" class="bg-blue-600 px-6 py-2 rounded-xl text-xs font-bold">GUARDAR</button>
                 </div>
             </div>
             <div id="notes-grid" class="grid grid-cols-1 gap-3"></div>
@@ -111,26 +101,26 @@
 
         <section id="v-rss" class="hidden space-y-4">
             <div class="glass p-4 rounded-3xl border border-blue-500/10">
-                <input type="text" id="rss-name" placeholder="Nombre Canal" class="w-full bg-white/5 p-2 rounded-xl text-xs mb-2 border border-white/10">
-                <input type="text" id="rss-url" placeholder="URL Feed (RSS)" class="w-full bg-white/5 p-2 rounded-xl text-xs mb-3 border border-white/10">
-                <button onclick="addRSS()" class="w-full bg-blue-600 py-3 rounded-xl text-[10px] font-bold uppercase">Añadir a mi Feed</button>
+                <input type="text" id="rss-name" placeholder="Nombre Canal" class="w-full bg-white/5 p-2 rounded-xl text-xs mb-2 outline-none">
+                <input type="text" id="rss-url" placeholder="https://..." class="w-full bg-white/5 p-2 rounded-xl text-xs mb-3 outline-none">
+                <button onclick="addRSS()" class="w-full bg-blue-600 py-3 rounded-xl text-[10px] font-bold uppercase">Guardar Feed</button>
             </div>
             <div id="rss-container" class="space-y-3"></div>
         </section>
 
         <section id="v-data" class="hidden space-y-6">
-            <div class="glass p-4 rounded-3xl border border-purple-500/20">
-                <input type="text" id="ai-prompt" placeholder="Ej: Mercado Tierras Raras 2026..." class="w-full bg-white/5 p-3 rounded-2xl text-xs mb-3 border border-white/10">
-                <button onclick="runAnalysisIA()" class="w-full bg-purple-600 py-3 rounded-xl text-xs font-bold uppercase">Generar Análisis</button>
+            <div class="glass p-4 rounded-3xl border border-purple-500/20 text-center">
+                <input type="text" id="ai-prompt" placeholder="Analiza: Mercado IA 2026..." class="w-full bg-white/5 p-3 rounded-2xl text-xs mb-3 outline-none border border-white/5">
+                <button onclick="runAnalysisIA()" class="w-full bg-purple-600 py-3 rounded-xl text-xs font-bold uppercase">Generar Análisis Maestro</button>
             </div>
             <div id="ai-visuals" class="space-y-6">
-                <canvas id="chartDoughnut" class="glass p-2 rounded-xl"></canvas>
-                <canvas id="chartBar" class="glass p-2 rounded-xl"></canvas>
-                <canvas id="chartLine" class="glass p-2 rounded-xl"></canvas>
+                <canvas id="chartDoughnut" class="glass p-4 rounded-2xl"></canvas>
+                <canvas id="chartBar" class="glass p-4 rounded-2xl"></canvas>
+                <canvas id="chartLine" class="glass p-4 rounded-2xl"></canvas>
                 <div id="ai-report" class="glass p-5 rounded-2xl text-[10px] hidden border-l-4 border-purple-500 bg-black/20"></div>
                 <div id="analysis-actions" class="hidden flex gap-2">
-                    <button onclick="extendResumenPro()" class="flex-1 bg-blue-600 py-3 rounded-xl font-bold uppercase text-[9px]">Extender 2000 carac.</button>
-                    <button onclick="window.print()" class="bg-gray-700 px-4 rounded-xl text-white"><i class="fa-solid fa-print"></i></button>
+                    <button onclick="extendResumenPro()" class="flex-1 bg-blue-600 py-3 rounded-xl font-bold uppercase text-[9px]">Extender Informe</button>
+                    <button onclick="window.print()" class="bg-gray-700 px-4 rounded-xl"><i class="fa-solid fa-print"></i></button>
                 </div>
             </div>
         </section>
@@ -143,7 +133,7 @@
         </div>
         <div id="chat-content" class="flex-1 p-3 overflow-y-auto text-[10px] space-y-2"></div>
         <div class="p-2 border-t border-white/10 flex gap-2">
-            <input type="text" id="chat-msg" class="flex-1 bg-black/40 p-2 rounded-xl text-[10px] outline-none" placeholder="Habla con VICO...">
+            <input type="text" id="chat-msg" class="flex-1 bg-black/40 p-2 rounded-xl text-[10px] outline-none" placeholder="Escribe...">
             <button onclick="sendChatIA()" class="bg-blue-600 px-3 rounded-xl"><i class="fa-solid fa-paper-plane"></i></button>
         </div>
     </div>
@@ -162,17 +152,15 @@
         </div>
         <div class="space-y-6">
             <div class="glass p-5 rounded-3xl border-l-4 border-yellow-500 shadow-2xl">
-                <input type="password" id="api-key-input" placeholder="API Key (Gemini/Groq)..." class="w-full bg-black/50 p-4 rounded-2xl text-xs border border-white/10 mb-4">
-                <div class="flex justify-between items-center glass p-3 rounded-xl mb-4"><span class="text-[10px] font-bold">SONIDOS UX</span><input type="checkbox" id="sound-toggle" class="w-5 h-5" checked></div>
+                <input type="password" id="api-key-input" placeholder="API Key..." class="w-full bg-black/50 p-4 rounded-2xl text-xs border border-white/10 mb-4">
+                <div class="flex justify-between items-center glass p-3 rounded-xl mb-4"><span class="text-[10px] font-bold">SONIDOS UX</span><input type="checkbox" id="sound-toggle" checked></div>
                 <div class="grid grid-cols-2 gap-2 mb-6">
-                    <button onclick="changeTheme('gold')" class="gold-grad p-3 rounded-xl text-[9px] font-bold uppercase shadow-lg">Gold Edition</button>
-                    <button onclick="changeTheme('cyber')" class="cyber-grad p-3 rounded-xl text-[9px] font-bold uppercase shadow-lg">Cyber Aura</button>
+                    <button onclick="changeTheme('gold')" class="gold-grad p-3 rounded-xl text-[9px] font-bold uppercase shadow-lg">Gold</button>
+                    <button onclick="changeTheme('cyber')" class="cyber-grad p-3 rounded-xl text-[9px] font-bold uppercase shadow-lg">Cyber</button>
                 </div>
-                <button onclick="saveSettings()" class="w-full bg-blue-600 py-4 rounded-2xl font-black uppercase text-xs">Sincronizar Cerebro</button>
+                <button onclick="saveSettings()" class="w-full bg-blue-600 py-4 rounded-2xl font-black uppercase text-xs">Sincronizar</button>
             </div>
-            <button onclick="window.open('https://www.paypal.me/texiduvi')" class="w-full bg-yellow-500 text-black py-5 rounded-[2rem] font-black uppercase flex items-center justify-center gap-3">
-                <i class="fa-brands fa-paypal text-xl"></i> Invitar un café ☕
-            </button>
+            <button onclick="window.open('https://www.paypal.me/texiduvi')" class="w-full bg-yellow-500 text-black py-5 rounded-[2rem] font-black uppercase flex items-center justify-center gap-3"><i class="fa-brands fa-paypal text-xl"></i> Invitar un café ☕</button>
         </div>
     </div>
 
@@ -180,44 +168,84 @@
         let notes = JSON.parse(localStorage.getItem('vico_notes')) || [];
         let folders = JSON.parse(localStorage.getItem('vico_folders')) || ['General'];
         let customButtons = JSON.parse(localStorage.getItem('vico_custom_btns')) || [];
+        let rssList = JSON.parse(localStorage.getItem('vico_rss')) || [];
         let chatMode = 'pro';
         let charts = {};
         let pomoInterval, pomoSeconds = 1500;
 
-        const MOTIVACIONES = [
-            {t: "La mejor forma de predecir el futuro es crearlo.", a: "P. Drucker"},
+        const FRASES = [
             {t: "La innovación diferencia a un líder de un seguidor.", a: "S. Jobs"},
-            {t: "La excelencia es un hábito.", a: "Aristóteles"},
+            {t: "La mejor forma de predecir el futuro es crearlo.", a: "P. Drucker"},
             {t: "VICO: Tu mente, expandida por la IA.", a: "AndyJavico"}
         ];
 
         window.onload = () => {
-            const random = MOTIVACIONES[Math.floor(Math.random() * MOTIVACIONES.length)];
+            const random = FRASES[Math.floor(Math.random() * FRASES.length)];
             document.getElementById('load-text').innerHTML = `"${random.t}"<br><small>— ${random.a}</small>`;
             let prog = 0;
             const int = setInterval(() => {
                 prog += 10; document.getElementById('prog-bar').style.width = prog + "%";
                 if(prog >= 100) { clearInterval(int); document.getElementById('loading-screen').style.display='none'; }
-            }, 60);
-            renderFolders(); renderDashboard(); fetchDiscoveryNews(); renderCustomButtons();
+            }, 50);
+            renderFolders(); renderDashboard(); renderRSS(); fetchDiscoveryNews(); renderCustomButtons();
             if(localStorage.getItem('vico_api_key')) document.querySelector('button[onclick="saveSettings()"]').classList.add('api-connected');
+            checkSharedParams();
         };
 
-    function switchTab(tab) {
-    ['home', 'links', 'notes', 'rss', 'data'].forEach(t => {
-        document.getElementById(`v-${t}`).classList.add('hidden');
-        document.getElementById(`btn-${t}`)?.classList.replace('tab-active', 'opacity-40');
-    });
-    
-    document.getElementById(`v-${tab}`).classList.remove('hidden');
-    document.getElementById(`btn-${tab}`)?.classList.add('tab-active');
-    
-    // REPARACIÓN: Renderizar carpetas y dashboard al entrar
-    if (tab === 'notes') renderFolders();
-    if (tab === 'home') renderDashboard();
-    
-    playUX('click');
-}
+        // ANDROID SHARE TARGET
+        function checkSharedParams() {
+            const params = new URLSearchParams(window.location.search);
+            const url = params.get('url') || params.get('text');
+            if(url) {
+                saveLinkToVico(params.get('title') || "Enlace Externo", url);
+                window.history.replaceState({}, document.title, window.location.pathname);
+                switchTab('links');
+            }
+        }
+
+        // DISCOVERY PRO
+        async function fetchDiscoveryNews() {
+            const container = document.getElementById('tech-discovery');
+            container.innerHTML = "<p class='animate-pulse text-[10px] text-center'>Sincronizando últimas noticias globales...</p>";
+            
+            // Usamos un proxy de feeds múltiple para tener más variedad
+            const feeds = [
+                'https://www.wired.com/feed/rss',
+                'https://www.xataka.com/feed/full',
+                'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/tecnologia/portada'
+            ];
+            
+            try {
+                const randomFeed = feeds[Math.floor(Math.random() * feeds.length)];
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(randomFeed)}`);
+                const data = await res.json();
+                
+                container.innerHTML = data.items.slice(0, 6).map(item => `
+                    <div class="keep-card">
+                        <img src="${item.thumbnail || 'icon.png'}" onerror="this.src='icon.png'">
+                        <div class="p-4">
+                            <h4 class="text-[10px] font-bold text-white uppercase mb-1 leading-tight">${item.title}</h4>
+                            <p class="text-[9px] opacity-60 line-clamp-4 mb-4">${item.description.replace(/<[^>]*>?/gm, '')}</p>
+                            <div class="flex gap-2">
+                                <button onclick="window.open('${item.link}', '_blank')" class="flex-1 bg-blue-600/20 text-blue-400 py-2 rounded-xl text-[8px] font-black uppercase">Leer más</button>
+                                <button onclick="saveLinkToVico('${item.title}', '${item.link}')" class="bg-white/5 px-4 py-2 rounded-xl text-[8px] font-black uppercase border border-white/10 text-purple-400">Guardar link</button>
+                            </div>
+                        </div>
+                    </div>`).join('');
+            } catch (e) { container.innerHTML = "<p class='text-red-400 text-center text-[9px]'>Error al cargar noticias. Reintenta.</p>"; }
+        }
+
+        function switchTab(t) {
+            ['home', 'links', 'notes', 'rss', 'data'].forEach(id => {
+                document.getElementById(`v-${id}`).classList.add('hidden');
+                document.getElementById(`btn-${id}`)?.classList.replace('tab-active', 'opacity-40');
+            });
+            document.getElementById(`v-${t}`).classList.remove('hidden');
+            document.getElementById(`btn-${t}`)?.classList.add('tab-active');
+            if(t === 'home') renderDashboard();
+            if(t === 'notes') renderFolders();
+            playUX('click');
+        }
 
         function toggleElement(id) { const el = document.getElementById(id); el.style.display = (el.style.display === 'flex') ? 'none' : 'flex'; }
         function openProfile() { document.getElementById('profile-modal').style.display='block'; document.body.classList.add('modal-open'); }
@@ -225,13 +253,48 @@
         function playUX(t) { if(document.getElementById('sound-toggle').checked) new Audio(t==='click'?'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3':'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3').play().catch(()=>{}); }
         function changeTheme(t) { document.body.className = `p-4 ${t}-grad`; playUX('pop'); }
 
+        // NOTAS & CARPETAS
+        function createFolder() {
+            const v = document.getElementById('folder-input').value.trim();
+            if(v && !folders.includes(v)) { folders.push(v); localStorage.setItem('vico_folders', JSON.stringify(folders)); renderFolders(); document.getElementById('folder-input').value=''; alert("Carpeta: "+v+" creada!"); }
+        }
+        function renderFolders() { document.getElementById('folder-target').innerHTML = folders.map(f => `<option value="${f}">${f}</option>`).join(''); }
+        function saveNote() {
+            const b = document.getElementById('note-input').value, f = document.getElementById('folder-target').value;
+            if(b) { notes.push({ body: b, folder: f }); localStorage.setItem('vico_notes', JSON.stringify(notes)); document.getElementById('note-input').value=''; renderNotes(); renderDashboard(); playUX('pop'); }
+        }
+        function renderNotes() { document.getElementById('notes-grid').innerHTML = notes.map(n => `<div class="glass p-3 rounded-xl border-l-2 border-blue-500 text-[10px] mb-2"><span class="text-[7px] opacity-40 block uppercase mb-1">${n.folder}</span>${n.body}</div>`).join(''); }
+
+        // RSS
+        function addRSS() {
+            const n = document.getElementById('rss-name').value, u = document.getElementById('rss-url').value;
+            if(n && u) { rssList.push({title: n, url: u}); localStorage.setItem('vico_rss', JSON.stringify(rssList)); renderRSS(); document.getElementById('rss-name').value=''; document.getElementById('rss-url').value=''; alert("RSS Guardado"); }
+        }
+        function renderRSS() { document.getElementById('rss-container').innerHTML = rssList.map((item, i) => `<div class="glass p-4 rounded-xl flex justify-between items-center border-l-2 border-blue-500"><span class="text-[9px] font-bold uppercase">${item.title}</span><button onclick="rssList.splice(${i},1);renderRSS();localStorage.setItem('vico_rss', JSON.stringify(rssList))" class="text-red-500"><i class="fa-solid fa-trash"></i></button></div>`).join(''); }
+
+        // IA & CHAT
+        async function sendChatIA() {
+            const input = document.getElementById('chat-msg'), key = localStorage.getItem('vico_api_key');
+            if(!input.value || !key) return;
+            const text = input.value;
+            document.getElementById('chat-content').innerHTML += `<p class="bg-blue-600/20 p-2 rounded-xl text-right">Tú: ${text}</p>`;
+            input.value = '';
+            const context = chatMode === 'pro' ? "Eres VICO PROFESIONAL." : "Eres VICO LIBRE.";
+            try {
+                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${key}`}, body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role:"system", content:context}, {role:"user", content:text}] }) });
+                const data = await res.json();
+                document.getElementById('chat-content').innerHTML += `<div class="bg-white/5 p-2 rounded-xl border-l-2 border-blue-500 mt-2">VICO: ${data.choices[0].message.content}</div>`;
+                document.getElementById('chat-content').scrollTop = document.getElementById('chat-content').scrollHeight;
+            } catch (e) { alert("Error API"); }
+        }
+
         async function runAnalysisIA() {
             const prompt = document.getElementById('ai-prompt').value, key = localStorage.getItem('vico_api_key');
             if(!prompt || !key) return;
-            const rep = document.getElementById('ai-report'); rep.classList.remove('hidden'); rep.innerHTML = "<p class='animate-pulse text-purple-400'>Analizando...</p>";
-            const command = `Analiza: "${prompt}". Responde solo JSON: {"labels":["A","B","C"],"data":[40,30,30],"bolsa_labels":["1h","4h","8h","12h","1d","2d"],"bolsa_data":[45,55,48,60,58,75],"excel":{"zona":"Asia","crecimiento":"+18%","riesgo":"Bajo"},"analisis":"Resumen..."}`;
+            const rep = document.getElementById('ai-report'); rep.classList.remove('hidden'); rep.innerHTML = "<p class='animate-pulse text-purple-400'>VICO Analizando...</p>";
+            const cmd = `Analiza: "${prompt}". Responde solo JSON: {"labels":["A","B","C"],"data":[40,30,30],"bolsa_labels":["10:00","14:00","18:00","22:00","02:00","06:00"],"bolsa_data":[45,55,48,60,58,75],"excel":{"zona":"Global","crecimiento":"+18%","riesgo":"Moderado"},"analisis":"Resumen..."}`;
             try {
-                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`}, body:JSON.stringify({model:"llama-3.3-70b-versatile", messages:[{role:"user",content:command}]}) });
+                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`}, body:JSON.stringify({model:"llama-3.3-70b-versatile", messages:[{role:"user",content:cmd}]}) });
                 const d = await res.json();
                 const dataIA = JSON.parse(d.choices[0].message.content.replace(/```json|```/g, ''));
                 updateCharts(dataIA);
@@ -250,15 +313,13 @@
             charts.line = new Chart(document.getElementById('chartLine'), { type:'line', data:{labels:d.bolsa_labels, datasets:[{data:d.bolsa_data, borderColor:'#22c55e', tension:0.4, fill:true, backgroundColor:'rgba(34,197,94,0.1)'}]}, options:{plugins:{legend:{display:false}}} });
         }
 
-        async function askLearning(url, materia) {
-            toggleElement('ai-chat-container');
-            const key = localStorage.getItem('vico_api_key');
-            document.getElementById('chat-content').innerHTML += `<p class="bg-purple-600/20 p-2 rounded-xl text-[9px]">Analizando para aprender ${materia}...</p>`;
-            try {
-                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`}, body:JSON.stringify({model:"llama-3.3-70b-versatile", messages:[{role:"system",content:"Eres un mentor."}, {role:"user",content:`Analiza ${url} y enséñame ${materia}.`}]}) });
-                const d = await res.json();
-                document.getElementById('chat-content').innerHTML += `<div class="bg-white/5 p-2 rounded-xl border-l-2 border-purple-500 mt-2"><b>Módulo ${materia}:</b><br>${d.choices[0].message.content}</div>`;
-            } catch (e) { alert("Error API"); }
+        // LINKS
+        function saveLinkToVico(l, u) {
+            const cleanUrl = u.includes('http') ? u : 'https://' + u;
+            const fav = `https://www.google.com/s2/favicons?sz=128&domain=${new URL(cleanUrl).hostname}`;
+            customButtons.unshift({ label: l, url: cleanUrl, favicon: fav });
+            localStorage.setItem('vico_custom_btns', JSON.stringify(customButtons));
+            renderCustomButtons(); renderDashboard(); playUX('pop');
         }
 
         function renderCustomButtons() {
@@ -267,48 +328,16 @@
                     <img src="${btn.favicon}" onerror="this.src='icon.png'">
                     <div class="p-3 text-left">
                         <h4 class="text-[10px] font-bold text-blue-400 uppercase truncate">${btn.label}</h4>
-                        <div class="flex flex-wrap gap-1 my-3">
-                            <button onclick="askLearning('${btn.url}','SEO')" class="bg-blue-600/20 px-2 py-1 rounded text-[7px] font-bold">SEO</button>
-                            <button onclick="askLearning('${btn.url}','COPY')" class="bg-purple-600/20 px-2 py-1 rounded text-[7px] font-bold">COPY</button>
-                        </div>
                         <button onclick="window.open('${btn.url}', '_self')" class="text-blue-400 text-[9px] mr-4 uppercase font-bold">Abrir</button>
-                        <button onclick="customButtons.splice(${i},1);localStorage.setItem('vico_custom_btns',JSON.stringify(customButtons));renderCustomButtons()" class="text-red-500 text-[9px] uppercase">Borrar</button>
+                        <button onclick="customButtons.splice(${i},1);localStorage.setItem('vico_custom_btns',JSON.stringify(customButtons));renderCustomButtons();renderDashboard()" class="text-red-500 text-[9px] uppercase">Borrar</button>
                     </div>
                 </div>`).join('');
         }
 
-        // OTROS MÉTODOS
-        function createFolder() { const v = document.getElementById('folder-input').value.trim(); if(v && !folders.includes(v)) { folders.push(v); localStorage.setItem('vico_folders', JSON.stringify(folders)); renderFolders(); document.getElementById('folder-input').value=''; } }
-        function renderFolders() { document.getElementById('folder-target').innerHTML = folders.map(f => `<option value="${f}">${f}</option>`).join(''); }
-        function saveNote() { const b = document.getElementById('note-input').value, f = document.getElementById('folder-target').value; if(b) { notes.push({ body: b, folder: f }); localStorage.setItem('vico_notes', JSON.stringify(notes)); document.getElementById('note-input').value=''; renderNotes(); renderDashboard(); playUX('pop'); } }
-        function renderNotes() { document.getElementById('notes-grid').innerHTML = notes.map(n => `<div class="glass p-3 rounded-xl border-l-2 border-blue-500 text-[10px] text-left mb-2"><span class="text-[7px] opacity-40 block uppercase mb-1">${n.folder}</span>${n.body}</div>`).join(''); }
         function renderDashboard() { document.getElementById('dash-notes-count').innerText = notes.length; document.getElementById('dash-links-count').innerText = customButtons.length; }
         function setChatMode(m) { chatMode = m; document.getElementById('mode-libre').classList.toggle('opacity-50', m==='pro'); document.getElementById('mode-pro').classList.toggle('opacity-50', m==='libre'); }
         function saveSettings() { localStorage.setItem('vico_api_key', document.getElementById('api-key-input').value); alert("Sincronizado."); location.reload(); }
         function pomoControl() { const btn = document.getElementById('pomo-btn'); if(btn.classList.contains('fa-play')) { btn.classList.replace('fa-play', 'fa-pause'); pomoInterval = setInterval(() => { pomoSeconds--; let m=Math.floor(pomoSeconds/60), s=pomoSeconds%60; document.getElementById('pomo-timer').innerText=`${m}:${s<10?'0':''}${s}`; if(pomoSeconds<=0){clearInterval(pomoInterval);alert("Tiempo!");}},1000); } else { btn.classList.replace('fa-pause', 'fa-play'); clearInterval(pomoInterval); }}
-        async function fetchDiscoveryNews() { try { const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.wired.com/feed/rss`); const data = await res.json(); document.getElementById('tech-discovery').innerHTML += data.items.slice(0, 4).map(item => `<div class="keep-card" onclick="window.open('${item.link}', '_blank')"><img src="${item.thumbnail || 'icon.png'}"><div class="p-3 text-left"><h4 class="text-[10px] font-bold text-white uppercase mb-1">${item.title}</h4><p class="text-[9px] opacity-60 line-clamp-4">${item.description.replace(/<[^>]*>?/gm, '')}</p></div></div>`).join(''); } catch (e) {}}
-function addRSS() {
-    const name = document.getElementById('rss-name').value;
-    const url = document.getElementById('rss-url').value;
-    
-    if(name && url) {
-        const nuevoFeed = { title: name, url: url.trim() };
-        rssList.push(nuevoFeed);
-        localStorage.setItem('vico_rss', JSON.stringify(rssList));
-        
-        renderRSS();
-        
-        // Limpiar campos
-        document.getElementById('rss-name').value = '';
-        document.getElementById('rss-url').value = '';
-        
-        alert("Feed guardado con éxito");
-    } else {
-        alert("Por favor, rellena ambos campos");
-    }
-}        async function sendChatIA() { const input = document.getElementById('chat-msg'), key = localStorage.getItem('vico_api_key'); if(!input.value || !key) return; const text = input.value; document.getElementById('chat-content').innerHTML += `<p class="bg-blue-600/20 p-2 rounded-xl text-right">Tú: ${text}</p>`; input.value = ''; const context = chatMode === 'pro' ? "Eres VICO PROFESIONAL." : "Eres VICO LIBRE."; try { const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${key}`}, body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role:"system", content:context}, {role:"user", content:text}] }) }); const data = await res.json(); document.getElementById('chat-content').innerHTML += `<div class="bg-white/5 p-2 rounded-xl border-l-2 border-blue-500 mt-2">VICO: ${data.choices[0].message.content}</div>`; document.getElementById('chat-content').scrollTop = document.getElementById('chat-content').scrollHeight; } catch (e) { alert("Error API"); } }
-        async function extendResumenPro() { const key = localStorage.getItem('vico_api_key'), p = document.getElementById('ai-prompt').value; document.getElementById('ai-report').innerHTML += "<p class='animate-pulse text-blue-400 mt-2'>Redactando informe 2000 carac...</p>"; const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${key}`}, body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role:"user", content:`Escribe un artículo extenso de 2000 caracteres sobre ${p} con H2 y negritas.`}] }) }); const d = await res.json(); document.getElementById('ai-report').innerHTML = `<div class="text-left text-[9px]">${d.choices[0].message.content}</div>`; }
-        function saveLinkToVico(l, u) { const cleanUrl = u.includes('http') ? u : 'https://' + u; const fav = `https://www.google.com/s2/favicons?sz=128&domain=${new URL(cleanUrl).hostname}`; customButtons.unshift({ label: l, url: cleanUrl, favicon: fav }); localStorage.setItem('vico_custom_btns', JSON.stringify(customButtons)); renderCustomButtons(); renderDashboard(); playUX('pop'); }
     </script>
 </body>
-</html>
+    </html>aa
