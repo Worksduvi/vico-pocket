@@ -1,9 +1,9 @@
 {
   "name": "VICO POCKET ELITE",
   "short_name": "VICO ELITE",
-  "start_url": "/index.html",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#000000",
+  "background_color": "#0b0f1a",
   "theme_color": "#3b82f6",
   "icons": [
     {
@@ -14,7 +14,7 @@
     }
   ],
   "share_target": {
-    "action": "/index.html",
+    "action": "./index.html",
     "method": "GET",
     "params": {
       "title": "title",
