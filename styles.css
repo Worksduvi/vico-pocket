@@ -22,3 +22,13 @@
 
 /* Gráficos */
 .chart-container { position: relative; height: 250px; width: 100%; margin-bottom: 20px; }
+/* Asegura que el contenido no sea tapado por el menú inferior */
+main#app-content {
+    padding-bottom: 120px; /* Ajusta según el alto de tu nav */
+}
+
+/* Fuerza que los botones de formulario estén siempre al frente */
+#v-rss input, #v-rss button {
+    position: relative;
+    z-index: 10;
+}
