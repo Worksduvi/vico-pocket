@@ -26,7 +26,16 @@
     </style>
 </head>
 <body class="p-4 pb-48">
+<div id="loading-screen">
+    <h1 class="text-2xl font-black italic text-blue-500 mb-2">VICO ELITE</h1>
+    <p id="load-text" class="text-[10px] text-gray-400 italic max-w-xs"></p>
+    <div class="loader-bar"><div id="prog-bar" class="loader-progress"></div></div>
+</div>
 
+<div class="flex border-b border-white/10">
+    <button onclick="chatMode='libre'" id="mode-libre" class="flex-1 py-1 text-[8px] font-bold uppercase bg-blue-600">Modo Libre</button>
+    <button onclick="chatMode='pro'" id="mode-pro" class="flex-1 py-1 text-[8px] font-bold uppercase opacity-50">Modo Pro</button>
+</div>
     <div class="fixed top-0 left-0 w-full glass z-[5000] p-3 flex justify-between items-center px-4">
         <div class="flex items-center gap-3">
             <div class="flex items-center gap-2 bg-black/40 p-1 px-2 rounded-xl border border-white/10">
@@ -162,6 +171,31 @@
     <script>
         let notes = JSON.parse(localStorage.getItem('vico_notes')) || [];
         let customButtons = JSON.parse(localStorage.getItem('vico_custom_btns')) || [];
+        let chatMode = 'pro'; // Por defecto profesional
+const motivaciones = [
+    {t: "La mejor forma de predecir el futuro es crearlo.", a: "P. Drucker"},
+    {t: "El éxito es la suma de pequeños esfuerzos repetidos.", a: "R. Collier"},
+    {t: "La innovación diferencia a un líder de un seguidor.", a: "S. Jobs"},
+    // ... agrega 17 más aquí
+];
+
+// Lógica de carga
+function initVicoLoader() {
+    const random = motivaciones[Math.floor(Math.random() * motivaciones.length)];
+    document.getElementById('load-text').innerText = `"${random.t}" - ${random.a}`;
+    let prog = 0;
+    const bar = document.getElementById('prog-bar');
+    const interval = setInterval(() => {
+        prog += Math.random() * 15;
+        if(prog >= 100) {
+            prog = 100;
+            clearInterval(interval);
+            setTimeout(() => document.getElementById('loading-screen').style.display='none', 500);
+        }
+        bar.style.width = prog + '%';
+    }, 100);
+}
+initVicoLoader();
         let rssList = JSON.parse(localStorage.getItem('vico_rss')) || [];
         let charts = {};
 
@@ -260,20 +294,36 @@
             document.getElementById('dash-links-count').innerText = customButtons.length;
         }
 
-        async function fetchDiscoveryNews() {
-            const container = document.getElementById('tech-discovery');
-            try {
-                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.wired.com/feed/rss`);
-                const data = await res.json();
-                container.innerHTML = '<h3 class="text-[11px] font-black text-purple-400 uppercase mb-3">Discovery Tech</h3>' + 
-                    data.items.slice(0, 3).map(item => `
-                    <div class="glass p-3 rounded-2xl mb-2 flex gap-3 items-center" onclick="window.open('${item.link}', '_blank')">
-                        <img src="${item.thumbnail}" class="w-8 h-8 rounded-lg">
-                        <h4 class="text-[9px] font-bold leading-tight">${item.title}</h4>
-                    </div>`).join('');
-            } catch (e) { container.innerHTML = '<p class="text-[9px] opacity-30 italic">Discovery en espera...</p>'; }
-        }
+      // REPARACIÓN RSS (Asegúrate que el botón tenga onclick="addRSS()")
+function addRSS() {
+    const name = document.getElementById('rss-name').value;
+    const url = document.getElementById('rss-url').value;
+    if(name && url) {
+        rssList.push({title: name, url: url});
+        localStorage.setItem('vico_rss', JSON.stringify(rssList));
+        renderRSS();
+        document.getElementById('rss-name').value = '';
+        document.getElementById('rss-url').value = '';
+        alert("Feed añadido!");
+    }
+}
 
+// DISCOVERY con 4 líneas de resumen
+async function fetchDiscoveryNews() {
+    const container = document.getElementById('tech-discovery');
+    try {
+        const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.wired.com/feed/rss`);
+        const data = await res.json();
+        container.innerHTML = data.items.slice(0, 4).map(item => `
+            <div class="keep-card mb-4" onclick="window.open('${item.link}', '_blank')">
+                <img src="${item.thumbnail || getFavicon(item.link)}">
+                <div class="p-3">
+                    <h4 class="text-[10px] font-bold text-white mb-1 uppercase">${item.title}</h4>
+                    <p class="text-[9px] opacity-60 line-clamp-4">${item.description.replace(/<[^>]*>?/gm, '')}</p>
+                </div>
+            </div>`).join('');
+    } catch (e) { container.innerHTML = "Error cargando noticias."; }
+}
         // CHAT MULTI-API MASTER
         async function sendChatIA() {
             const msgInput = document.getElementById('chat-msg');
@@ -384,6 +434,23 @@
             fetchDiscoveryNews();
             if(localStorage.getItem('vico_api_key')) document.querySelector('button[onclick="saveSettings()"]').classList.add('api-connected');
         });
+        const vicoErrors = {
+    "auth": "API Key incorrecta. Revisa el Perfil.",
+    "rate_limit": "Demasiadas peticiones. Groq está descansando.",
+    "network": "Sin internet o VPN bloqueada.",
+    "json": "Error en formato de datos IA."
+};
+
+function handleVicoError(type) {
+    const solution = vicoErrors[type] || "Error desconocido. Reinicia la App.";
+    const errorHTML = `
+        <div class="bg-red-600/20 border border-red-500 p-3 rounded-2xl text-[9px] mt-4">
+            <p class="font-bold">⚠️ VICO ERROR DETECTADO</p>
+            <p>${solution}</p>
+        </div>
+    `;
+    document.getElementById('chat-content').innerHTML += errorHTML;
+}
     </script>
 </body>
 </html>
