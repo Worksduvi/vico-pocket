@@ -287,8 +287,26 @@
         function saveSettings() { localStorage.setItem('vico_api_key', document.getElementById('api-key-input').value); alert("Sincronizado."); location.reload(); }
         function pomoControl() { const btn = document.getElementById('pomo-btn'); if(btn.classList.contains('fa-play')) { btn.classList.replace('fa-play', 'fa-pause'); pomoInterval = setInterval(() => { pomoSeconds--; let m=Math.floor(pomoSeconds/60), s=pomoSeconds%60; document.getElementById('pomo-timer').innerText=`${m}:${s<10?'0':''}${s}`; if(pomoSeconds<=0){clearInterval(pomoInterval);alert("Tiempo!");}},1000); } else { btn.classList.replace('fa-pause', 'fa-play'); clearInterval(pomoInterval); }}
         async function fetchDiscoveryNews() { try { const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.wired.com/feed/rss`); const data = await res.json(); document.getElementById('tech-discovery').innerHTML += data.items.slice(0, 4).map(item => `<div class="keep-card" onclick="window.open('${item.link}', '_blank')"><img src="${item.thumbnail || 'icon.png'}"><div class="p-3 text-left"><h4 class="text-[10px] font-bold text-white uppercase mb-1">${item.title}</h4><p class="text-[9px] opacity-60 line-clamp-4">${item.description.replace(/<[^>]*>?/gm, '')}</p></div></div>`).join(''); } catch (e) {}}
-        function addRSS() { const n = document.getElementById('rss-name').value, u = document.getElementById('rss-url').value; if(n && u) { rssList.push({title: n, url: u}); localStorage.setItem('vico_rss', JSON.stringify(rssList)); document.getElementById('rss-name').value=''; document.getElementById('rss-url').value=''; } }
-        async function sendChatIA() { const input = document.getElementById('chat-msg'), key = localStorage.getItem('vico_api_key'); if(!input.value || !key) return; const text = input.value; document.getElementById('chat-content').innerHTML += `<p class="bg-blue-600/20 p-2 rounded-xl text-right">Tú: ${text}</p>`; input.value = ''; const context = chatMode === 'pro' ? "Eres VICO PROFESIONAL." : "Eres VICO LIBRE."; try { const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${key}`}, body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role:"system", content:context}, {role:"user", content:text}] }) }); const data = await res.json(); document.getElementById('chat-content').innerHTML += `<div class="bg-white/5 p-2 rounded-xl border-l-2 border-blue-500 mt-2">VICO: ${data.choices[0].message.content}</div>`; document.getElementById('chat-content').scrollTop = document.getElementById('chat-content').scrollHeight; } catch (e) { alert("Error API"); } }
+function addRSS() {
+    const name = document.getElementById('rss-name').value;
+    const url = document.getElementById('rss-url').value;
+    
+    if(name && url) {
+        const nuevoFeed = { title: name, url: url.trim() };
+        rssList.push(nuevoFeed);
+        localStorage.setItem('vico_rss', JSON.stringify(rssList));
+        
+        renderRSS();
+        
+        // Limpiar campos
+        document.getElementById('rss-name').value = '';
+        document.getElementById('rss-url').value = '';
+        
+        alert("Feed guardado con éxito");
+    } else {
+        alert("Por favor, rellena ambos campos");
+    }
+}        async function sendChatIA() { const input = document.getElementById('chat-msg'), key = localStorage.getItem('vico_api_key'); if(!input.value || !key) return; const text = input.value; document.getElementById('chat-content').innerHTML += `<p class="bg-blue-600/20 p-2 rounded-xl text-right">Tú: ${text}</p>`; input.value = ''; const context = chatMode === 'pro' ? "Eres VICO PROFESIONAL." : "Eres VICO LIBRE."; try { const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${key}`}, body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role:"system", content:context}, {role:"user", content:text}] }) }); const data = await res.json(); document.getElementById('chat-content').innerHTML += `<div class="bg-white/5 p-2 rounded-xl border-l-2 border-blue-500 mt-2">VICO: ${data.choices[0].message.content}</div>`; document.getElementById('chat-content').scrollTop = document.getElementById('chat-content').scrollHeight; } catch (e) { alert("Error API"); } }
         async function extendResumenPro() { const key = localStorage.getItem('vico_api_key'), p = document.getElementById('ai-prompt').value; document.getElementById('ai-report').innerHTML += "<p class='animate-pulse text-blue-400 mt-2'>Redactando informe 2000 carac...</p>"; const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { method: 'POST', headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${key}`}, body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role:"user", content:`Escribe un artículo extenso de 2000 caracteres sobre ${p} con H2 y negritas.`}] }) }); const d = await res.json(); document.getElementById('ai-report').innerHTML = `<div class="text-left text-[9px]">${d.choices[0].message.content}</div>`; }
         function saveLinkToVico(l, u) { const cleanUrl = u.includes('http') ? u : 'https://' + u; const fav = `https://www.google.com/s2/favicons?sz=128&domain=${new URL(cleanUrl).hostname}`; customButtons.unshift({ label: l, url: cleanUrl, favicon: fav }); localStorage.setItem('vico_custom_btns', JSON.stringify(customButtons)); renderCustomButtons(); renderDashboard(); playUX('pop'); }
     </script>
