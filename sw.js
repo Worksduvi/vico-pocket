@@ -42,3 +42,10 @@ self.addEventListener('fetch', (e) => {
     })
   );
 });
+function changeTheme(t) {
+    document.body.className = `p-4 pb-48 ${t}-grad`;
+    // Definimos los gradientes si no están en tu CSS
+    if(t === 'gold') document.body.style.background = "linear-gradient(135deg, #0f0c08, #262112)";
+    if(t === 'cyber') document.body.style.background = "linear-gradient(135deg, #000428, #004e92)";
+    playUX('click');
+}
