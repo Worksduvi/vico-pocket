@@ -2,116 +2,174 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VICO POCKET ELITE</title>
-    </head>
-<body>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root { --vbg: #0b0f1a; --vacc: #3b82f6; --vtxt: #e2e8f0; }
+        body { background: var(--vbg); color: var(--vtxt); font-family: 'Inter', sans-serif; transition: 0.3s; margin: 0; }
+        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
+        
+        /* Imágenes centradas y no expandidas */
+        .keep-card img { width: 80%; height: 140px; object-fit: contain; margin: 10px auto; display: block; border-radius: 12px; background: #161b22; }
+        
+        /* Header alineado a la izquierda */
+        header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; width: 100%; }
+        .vico-brand { font-weight: 900; font-style: italic; color: var(--vacc); font-size: 1.5rem; text-align: left; }
+        
+        /* Notificación de guardado */
+        #save-confirm { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #22c55e; color: white; padding: 20px; border-radius: 50%; display: none; z-index: 10000; animation: pulse-green 2s infinite; }
+        @keyframes pulse-green { 0% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.2); } 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
 
-    <div id="save-confirm"><i class="fa-solid fa-check"></i> GUARDADO</div>
+        /* Pestañas de carpetas */
+        .folder-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; }
+        .folder-tab { background: rgba(255,255,255,0.05); padding: 6px 14px; border-radius: 20px; font-size: 10px; white-space: nowrap; cursor: pointer; border: 1px solid transparent; }
+        .folder-tab.active { background: var(--vacc); border-color: white; }
 
-    <header class="top-bar glass">
-        <div class="vico-title">VICO POCKET <span style="font-size:8px; border:1px solid; padding:2px;">ELITE</span></div>
-        <div class="flex items-center gap-3">
-             <select id="lang-selector" onchange="changeLang()" class="bg-transparent text-[10px] uppercase font-bold border-none">
-                <option value="es">ES</option>
-                <option value="en">EN</option>
-                <option value="zh">ZH</option>
-                <option value="fil">FIL</option>
-                <option value="hi">HI</option>
-                <option value="ms">MS</option>
-             </select>
-             <button onclick="toggleDarkMode()" id="dark-btn"><i class="fa-solid fa-moon"></i></button>
+        main { padding-bottom: 120px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body class="p-4">
+
+    <div id="save-confirm"><i class="fa-solid fa-check fa-3x"></i></div>
+
+    <header class="fixed top-0 left-0 glass z-[5000]">
+        <div class="vico-brand">VICO POCKET <span class="text-[10px] border border-blue-500 px-1 italic">ELITE</span></div>
+        <div class="flex gap-3">
+            <select id="lang-sel" onchange="translateApp()" class="bg-transparent text-[10px] font-bold outline-none">
+                <option value="es">ES</option><option value="en">EN</option><option value="zh">ZH</option>
+            </select>
+            <button onclick="toggleDark()"><i class="fa-solid fa-moon"></i></button>
         </div>
     </header>
 
-    <section id="v-home" class="p-4">
-        <div id="dash-phrases" class="glass p-4 rounded-2xl mb-4 italic text-[11px] text-blue-300 text-center"></div>
-        <div class="grid grid-cols-2 gap-3 mb-6">
-            <div class="glass p-3 rounded-2xl text-center"><span class="text-[10px] opacity-50 block uppercase" data-i18n="notes">Notas</span><span id="dash-notes-count">0</span></div>
-            <div class="glass p-3 rounded-2xl text-center"><span class="text-[10px] opacity-50 block uppercase" data-i18n="links">Links</span><span id="dash-links-count">0</span></div>
-        </div>
-        
-        <div class="flex justify-between mb-2">
-            <h3 class="text-xs font-bold" data-i18n="discovery">DISCOVERY</h3>
-            <select id="discovery-cat" onchange="fetchDiscoveryNews()" class="bg-transparent text-[10px] border border-white/20 rounded px-2">
-                <option value="ai">AI / IA</option>
-                <option value="science">Ciencia</option>
-                <option value="tech">Microsoft/Google/Nvidia</option>
-                <option value="finanzas">Finanzas</option>
-                <option value="gadgets">Gadgets</option>
-            </select>
-        </div>
-        <div id="discovery-container"></div>
-    </section>
-
-    <section id="v-calendar" class="hidden p-4">
-        <h3 class="font-bold mb-4 uppercase text-xs" data-i18n="calendar">Calendario y Citas</h3>
-        <input type="date" id="cal-date" class="w-full bg-white/5 p-3 rounded-xl mb-2">
-        <input type="text" id="cal-text" placeholder="¿Qué hay que recordar?" class="w-full bg-white/5 p-3 rounded-xl mb-4">
-        <button onclick="addReminder()" class="w-full bg-blue-600 p-3 rounded-xl font-bold uppercase text-[10px]">Añadir Evento</button>
-        <div id="reminder-list" class="mt-4 space-y-2"></div>
-    </section>
-
-    <section id="v-profile" class="hidden p-4">
-        <div class="glass p-4 rounded-2xl mb-4">
-            <p class="text-[10px] font-bold uppercase mb-2">Sonido de Notificación</p>
-            <select id="sound-select" class="w-full bg-black/40 p-2 rounded-xl text-xs">
-                <option value="soft">Seda (Elegante)</option>
-                <option value="zen">Zen (Suave)</option>
-                <option value="digital">Vico Digital</option>
-            </select>
-        </div>
-
-        <div class="glass p-4 rounded-2xl mb-4">
-            <p class="text-[10px] font-bold uppercase mb-2">Diseñador de Botones</p>
-            <input type="text" id="custom-btn-url" placeholder="URL..." class="w-full bg-white/5 p-2 rounded-lg mb-2">
-            <select id="btn-shape" class="w-full bg-white/5 p-2 rounded-lg mb-2">
-                <option value="rounded-full">Círculo</option>
-                <option value="rounded-xl">Cuadrado</option>
-                <option value="rounded-none">Plano</option>
-            </select>
-            <input type="color" id="btn-color" class="w-full mb-2">
-            <input type="range" id="btn-size" min="10" max="100" class="w-full">
-            <button onclick="createCustomBtn()" class="w-full bg-blue-500 py-2 rounded-lg mt-2 text-[10px]">GENERAR BOTÓN</button>
-        </div>
-
-        <div class="grid grid-cols-2 gap-2 mb-10">
-            <button onclick="showHistory('analysis')" class="bg-purple-600/20 p-4 rounded-xl text-[10px]">HISTORIAL ANÁLISIS</button>
-            <button onclick="showHistory('notif')" class="bg-blue-600/20 p-4 rounded-xl text-[10px]">HISTORIAL NOTIF.</button>
-        </div>
-
-        <div class="text-center opacity-40 mt-10">
-            <p class="text-[10px]">VICO POCKET © 2026</p>
-            <p class="font-bold text-xs">Desarrollado por AndyJavico</p>
-            <a href="https://linkedin.com/in/tu-link" target="_blank" class="text-xl mt-2 block"><i class="fa-brands fa-linkedin"></i></a>
-        </div>
-    </section>
-
-    <nav class="fixed bottom-0 w-full glass flex justify-around p-3 z-[5000]">
-        <button onclick="switchTab('home')"><i class="fa-solid fa-house"></i></button>
-        <button onclick="switchTab('calendar')"><i class="fa-solid fa-calendar-day"></i></button>
-        <button onclick="switchTab('links')"><i class="fa-solid fa-link"></i></button>
-        <button onclick="switchTab('notes')"><i class="fa-solid fa-note-sticky"></i></button>
-        <button onclick="switchTab('profile')"><i class="fa-solid fa-gear"></i></button>
+    <nav class="mt-16 flex gap-4 border-b border-white/10 pb-2 overflow-x-auto text-[10px] font-bold uppercase">
+        <button onclick="switchTab('home')" id="btn-home" class="text-blue-400">Home🏡</button>
+        <button onclick="switchTab('links')" id="btn-links" class="opacity-40">Links🔗</button>
+        <button onclick="switchTab('notes')" id="btn-notes" class="opacity-40">Notas📝</button>
+        <button onclick="switchTab('calendar')" id="btn-calendar" class="opacity-40">Eventos📅</button>
+        <button onclick="switchTab('data')" id="btn-data" class="opacity-40">Análisis🪄</button>
     </nav>
 
-    <div id="share-modal" class="modal-full bg-black/95">
-        <div class="p-6">
-            <h2 class="text-xl font-bold mb-4">Guardar en VICO</h2>
-            <p id="share-url-text" class="text-[10px] mb-4 break-all opacity-50"></p>
-            <p class="text-xs mb-2">Añadir Etiqueta:</p>
-            <div class="grid grid-cols-2 gap-2 mb-6">
-                <button onclick="setTag('IA')" class="tag-btn">#IA</button>
-                <button onclick="setTag('Salud')" class="tag-btn">#Salud</button>
-                <button onclick="setTag('Economía')" class="tag-btn">#Economía</button>
-                <button onclick="setTag('Gadgets')" class="tag-btn">#Gadgets</button>
-                <button onclick="setTag('Cursos')" class="tag-btn">#Cursos</button>
-                <button onclick="setTag('Finanzas')" class="tag-btn">#Finanzas</button>
-                <button onclick="setTag('Ventas')" class="tag-btn">#Ventas</button>
-                <button onclick="setTag('Viral')" class="tag-btn">#Viral</button>
+    <main id="app-content" class="mt-6">
+        <section id="v-home">
+            <div id="top-phrase" class="glass p-4 rounded-2xl mb-6 text-[11px] italic text-blue-300 text-center border-l-4 border-blue-500"></div>
+            <div class="flex justify-between items-center mb-4">
+                <select id="news-cat" onchange="fetchDiscovery()" class="bg-white/5 text-[10px] p-2 rounded-xl outline-none">
+                    <option value="ai">Inteligencia Artificial</option>
+                    <option value="tech">Nvidia / Google / OpenAI</option>
+                    <option value="science">Ciencia & Inventos</option>
+                    <option value="finance">Economía & Finanzas</option>
+                </select>
+                <button onclick="fetchDiscovery()" class="bg-blue-600/20 text-blue-400 px-3 py-2 rounded-xl text-[10px] font-bold"><i class="fa-solid fa-rotate"></i></button>
             </div>
-            <button onclick="confirmQuickSave()" class="w-full bg-blue-600 py-4 rounded-2xl font-black">GUARDAR Y CERRAR</button>
+            <div id="discovery-list" class="space-y-4"></div>
+        </section>
+
+        <section id="v-notes" class="hidden">
+            <div id="folder-tabs" class="folder-tabs mb-4"></div>
+            <div class="glass p-4 rounded-3xl mb-4">
+                <input type="text" id="note-search" placeholder="Buscar en esta carpeta..." class="w-full bg-white/5 p-2 rounded-xl text-xs mb-3 outline-none">
+                <textarea id="note-input" class="w-full bg-transparent text-xs h-24 outline-none" placeholder="Escribe tu idea..."></textarea>
+                <button onclick="saveNote()" class="w-full bg-blue-600 py-3 rounded-xl font-bold mt-2">GUARDAR NOTA</button>
+            </div>
+            <div id="notes-grid" class="grid grid-cols-2 gap-3"></div>
+        </section>
+
+        <section id="v-calendar" class="hidden">
+            <div class="glass p-5 rounded-3xl">
+                <h3 class="text-xs font-bold mb-4 uppercase">Nuevo Recordatorio</h3>
+                <input type="date" id="cal-date" class="w-full bg-white/5 p-3 rounded-xl mb-2 outline-none">
+                <input type="text" id="cal-text" placeholder="Título del evento..." class="w-full bg-white/5 p-3 rounded-xl mb-4 outline-none text-xs">
+                <button onclick="addReminder()" class="w-full bg-blue-600 py-3 rounded-xl font-bold uppercase text-[10px]">Agendar Notificación</button>
+            </div>
+            <div id="notif-history" class="mt-6 space-y-2"></div>
+        </section>
+    </main>
+
+    <div id="share-modal" class="fixed inset-0 bg-black/95 z-[10000] hidden flex flex-col p-6">
+        <h2 class="text-xl font-black mb-2">GUARDAR ENLACE</h2>
+        <p id="share-url-disp" class="text-[10px] opacity-40 mb-6 truncate"></p>
+        <p class="text-xs font-bold mb-3 uppercase tracking-widest text-blue-400">Añadir Etiqueta:</p>
+        <div class="grid grid-cols-2 gap-2 mb-8">
+            <button onclick="confirmSave('IA')" class="glass p-3 rounded-xl text-[10px] font-bold">#IA</button>
+            <button onclick="confirmSave('Cursos')" class="glass p-3 rounded-xl text-[10px] font-bold">#Cursos</button>
+            <button onclick="confirmSave('Ventas')" class="glass p-3 rounded-xl text-[10px] font-bold">#Ventas</button>
+            <button onclick="confirmSave('Salud')" class="glass p-3 rounded-xl text-[10px] font-bold">#Salud</button>
         </div>
+        <button onclick="confirmSave('General')" class="w-full bg-blue-600 py-5 rounded-3xl font-black text-lg shadow-xl">GUARDAR Y CERRAR</button>
     </div>
 
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] glass p-2 flex justify-around items-center rounded-[2.5rem] z-[4000]">
+        <button onclick="switchTab('links')" class="p-4 opacity-40"><i class="fa-solid fa-link"></i></button>
+        <button onclick="switchTab('notes')" class="p-4 opacity-40"><i class="fa-solid fa-note-sticky"></i></button>
+        <button onclick="switchTab('home')" class="p-4"><i class="fa-solid fa-house"></i></button>
+        <button onclick="openProfile()" class="p-4 opacity-40"><i class="fa-solid fa-id-card-clip"></i></button>
+    </nav>
+
+    <script>
+        let notes = JSON.parse(localStorage.getItem('vico_notes')) || [];
+        let folders = ['General', 'Trabajo', 'Personal', 'IA', 'Web'];
+        let currentFolder = 'General';
+        
+        const MOTIVACIONES = ["La innovación diferencia a un líder de un seguidor.", "Hazlo simple, pero significativo.", "La mejor forma de predecir el futuro es crearlo."];
+
+        window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
+            if(params.get('url')) {
+                document.getElementById('share-modal').classList.remove('hidden');
+                document.getElementById('share-url-disp').innerText = params.get('url');
+            }
+            document.getElementById('top-phrase').innerText = MOTIVACIONES[Math.floor(Math.random()*MOTIVACIONES.length)];
+            fetchDiscovery();
+            renderFolders();
+        };
+
+        function switchTab(t) {
+            document.querySelectorAll('main section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`v-${t}`).classList.remove('hidden');
+        }
+
+        function renderFolders() {
+            const container = document.getElementById('folder-tabs');
+            container.innerHTML = folders.map(f => `<div onclick="currentFolder='${f}';renderFolders();renderNotes()" class="folder-tab ${currentFolder===f?'active':''}">${f}</div>`).join('');
+        }
+
+        async function fetchDiscovery() {
+            const container = document.getElementById('discovery-list');
+            container.innerHTML = "<p class='animate-pulse text-center text-[10px]'>Sincronizando noticias...</p>";
+            try {
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.wired.com/feed/rss`);
+                const data = await res.json();
+                container.innerHTML = data.items.slice(0, 10).map(item => `
+                    <div class="keep-card glass p-3 rounded-2xl">
+                        <img src="${item.thumbnail || 'icon.png'}">
+                        <h4 class="text-[10px] font-bold uppercase mb-2">${item.title}</h4>
+                        <div class="flex gap-2">
+                            <button onclick="window.open('${item.link}')" class="flex-1 bg-blue-600/20 text-blue-400 py-2 rounded-xl text-[8px] font-black uppercase">Leer</button>
+                            <button onclick="speak('${item.title}')" class="bg-white/5 px-3 rounded-xl"><i class="fa-solid fa-volume-high"></i></button>
+                        </div>
+                    </div>`).join('');
+            } catch(e) { container.innerHTML = "Error de red."; }
+        }
+
+        function speak(t) {
+            const utterance = new SpeechSynthesisUtterance(t);
+            utterance.lang = 'es-ES';
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function confirmSave(tag) {
+            document.getElementById('save-confirm').style.display = 'block';
+            setTimeout(() => { window.close(); }, 2000);
+        }
+
+        function toggleDark() { document.body.classList.toggle('light-mode'); }
+        function openProfile() { alert("Perfil: AndyJavico - LinkedIn: linkedin.com/in/andyjavico"); }
+    </script>
 </body>
 </html>
