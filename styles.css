@@ -32,7 +32,11 @@ button, input, select, textarea {
     z-index: 20; 
     pointer-events: auto !important; 
 }
-
+#v-rss {
+    padding-bottom: 180px !important; /* Empuja el formulario hacia arriba */
+    position: relative;
+    z-index: 50;
+}
 /* Modales Pro (Fijan el desfase en Configuración) */
 .modal-full { 
     position: fixed; 
