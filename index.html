@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VICO POCKET ELITE v8</title>
+    <title>VICO POCKET ELITE v8.5</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -12,30 +12,36 @@
     <style>
         :root { --vbg: #0b0f1a; --vacc: #3b82f6; --vtxt: #e2e8f0; --aura: rgba(59, 130, 246, 0.5); }
         body { background: var(--vbg); color: var(--vtxt); font-family: 'Inter', sans-serif; transition: 0.5s; margin: 0; min-height: 100vh; overflow-x: hidden; }
-        body.light-mode { --vbg: #f8fafc; --vtxt: #0f172a; --vacc: #2563eb; --aura: rgba(37, 99, 235, 0.2); }
         .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.1); }
         .aura-btn { border: 1px solid var(--vacc); box-shadow: 0 0 10px var(--aura); transition: 0.3s; cursor: pointer; }
-        .modal-full { position: fixed; inset: 0; background: var(--vbg); z-index: 9999; padding: 2rem; overflow-y: auto; display: none; }
-        .gold-grad { background: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728) !important; color: #000 !important; }
-        .cyber-grad { background: linear-gradient(135deg, #2d00f7, #ff00bd) !important; color: #fff !important; }
         .tab-active { color: var(--vacc); border-bottom: 2px solid var(--vacc); opacity: 1 !important; }
-        .chat-box { width: 320px; height: 450px; display: none; flex-direction: column; z-index: 9000; }
-        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
-        .api-connected { animation: pulse-green 2s infinite; border-color: #22c55e !important; color: #22c55e !important; }
-        .home-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .chat-box { width: 320px; height: 480px; display: none; flex-direction: column; z-index: 9000; }
+        
+        /* Pantalla de Carga */
+        #loading-screen { position: fixed; inset: 0; background: #0b0f1a; z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .loader-bar { width: 220px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; margin-top: 20px; }
+        .loader-progress { width: 0%; height: 100%; background: #3b82f6; transition: 0.3s; }
+
+        /* Estilo Keep para Links */
+        .keep-card { background: rgba(255,255,255,0.03); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; margin-bottom: 15px; }
+        .keep-card img { width: 100%; height: 140px; object-fit: cover; background: #161b29; }
+        .line-clamp-4 { display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+
+        /* Arreglo de botones y capas */
+        main { padding-bottom: 120px; }
+        #v-rss, #v-data, #v-notes { position: relative; z-index: 10; }
+        .modal-full { position: fixed; inset: 0; background: var(--vbg); z-index: 9999; padding: 2rem; overflow-y: auto; display: none; }
+        .api-connected { border-color: #22c55e !important; color: #22c55e !important; box-shadow: 0 0 15px rgba(34,197,94,0.3); }
     </style>
 </head>
-<body class="p-4 pb-48">
-<div id="loading-screen">
-    <h1 class="text-2xl font-black italic text-blue-500 mb-2">VICO ELITE</h1>
-    <p id="load-text" class="text-[10px] text-gray-400 italic max-w-xs"></p>
-    <div class="loader-bar"><div id="prog-bar" class="loader-progress"></div></div>
-</div>
+<body class="p-4">
 
-<div class="flex border-b border-white/10">
-    <button onclick="chatMode='libre'" id="mode-libre" class="flex-1 py-1 text-[8px] font-bold uppercase bg-blue-600">Modo Libre</button>
-    <button onclick="chatMode='pro'" id="mode-pro" class="flex-1 py-1 text-[8px] font-bold uppercase opacity-50">Modo Pro</button>
-</div>
+    <div id="loading-screen">
+        <h1 class="text-3xl font-black italic text-blue-500 mb-2">VICO ELITE</h1>
+        <p id="load-text" class="text-[10px] text-gray-400 italic px-6"></p>
+        <div class="loader-bar"><div id="prog-bar" class="loader-progress"></div></div>
+    </div>
+
     <div class="fixed top-0 left-0 w-full glass z-[5000] p-3 flex justify-between items-center px-4">
         <div class="flex items-center gap-3">
             <div class="flex items-center gap-2 bg-black/40 p-1 px-2 rounded-xl border border-white/10">
@@ -44,11 +50,11 @@
             </div>
             <button onclick="toggleElement('ai-chat-container')" class="glass p-2 rounded-xl text-blue-400 aura-btn"><i class="fa-solid fa-robot"></i></button>
         </div>
-        <button onclick="toggleDarkMode()" class="text-lg"><i class="fa-solid fa-circle-half-stroke"></i></button>
+        <button onclick="document.body.classList.toggle('light-mode')" class="text-lg"><i class="fa-solid fa-circle-half-stroke"></i></button>
     </div>
 
     <header class="mt-16 mb-6 text-center">
-        <h1 class="text-3xl font-black italic text-blue-500 tracking-tighter">VICO POCKET <span class="text-[10px] border border-blue-500 px-1">ELITE</span></h1>
+        <h1 class="text-3xl font-black italic text-blue-500 tracking-tighter">VICO POCKET <span class="text-[10px] border border-blue-500 px-1 font-sans">ELITE</span></h1>
     </header>
 
     <nav class="flex gap-4 mb-6 border-b border-white/10 text-[11px] font-black pb-2 overflow-x-auto">
@@ -62,19 +68,16 @@
     <main id="app-content">
         <section id="v-home" class="space-y-6">
             <div class="glass p-4 rounded-3xl border border-blue-500/20">
-                <h3 class="text-[11px] font-black text-blue-400 mb-3 uppercase tracking-tighter">Dashboard</h3>
-                <div class="home-grid">
-                    <div class="glass p-3 rounded-2xl text-center">
-                        <span class="text-[9px] opacity-50 block uppercase">Notas</span>
-                        <span id="dash-notes-count" class="text-lg font-bold">0</span>
-                    </div>
-                    <div class="glass p-3 rounded-2xl text-center">
-                        <span class="text-[9px] opacity-50 block uppercase">Links</span>
-                        <span id="dash-links-count" class="text-lg font-bold">0</span>
-                    </div>
+                <h3 class="text-[10px] font-black text-blue-400 mb-3 uppercase">Resumen de Actividad</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="glass p-3 rounded-2xl text-center"><span class="text-[9px] opacity-50 block">NOTAS</span><span id="dash-notes-count" class="text-lg font-bold">0</span></div>
+                    <div class="glass p-3 rounded-2xl text-center"><span class="text-[9px] opacity-50 block">LINKS</span><span id="dash-links-count" class="text-lg font-bold">0</span></div>
                 </div>
             </div>
-            <div id="tech-discovery" class="space-y-3"></div>
+            <div id="tech-discovery" class="space-y-4">
+                <h3 class="text-[11px] font-black text-purple-400 uppercase">Discovery: Tech, IA & Salud</h3>
+                <div class="p-8 text-center text-[10px] opacity-50 italic">Sincronizando noticias globales...</div>
+            </div>
         </section>
 
         <section id="v-links" class="hidden space-y-4">
@@ -82,98 +85,57 @@
                 <input type="text" id="manual-url" placeholder="Pega una URL aquí..." class="flex-1 bg-white/5 p-2 rounded-xl text-[10px] outline-none">
                 <button onclick="addManualLink()" class="bg-blue-600 px-4 py-2 rounded-xl text-[10px] font-bold">AÑADIR</button>
             </div>
-            <div id="links-list" class="grid gap-3"></div>
+            <div id="links-list" class="grid gap-4"></div>
         </section>
 
         <section id="v-notes" class="hidden space-y-4">
             <div class="glass p-4 rounded-3xl border border-blue-500/20">
+                <input type="text" id="folder-input" placeholder="Nueva Carpeta..." class="w-full bg-white/5 p-2 rounded-xl text-xs mb-2 border border-white/10 outline-none">
+                <button onclick="createFolder()" class="w-full bg-blue-600/20 text-blue-400 py-1 rounded-lg text-[10px] font-bold mb-4 uppercase text-center">Crear Carpeta</button>
                 <textarea id="note-input" class="w-full bg-transparent text-xs h-24 outline-none" placeholder="Escribe tu idea..."></textarea>
-                <button onclick="saveNote()" class="w-full bg-blue-600 py-2 rounded-xl text-xs font-bold aura-btn">GUARDAR NOTA</button>
+                <div class="flex justify-between items-center mt-2">
+                    <select id="folder-target" class="bg-black/40 text-[10px] p-2 rounded-xl border border-white/10"></select>
+                    <button onclick="saveNote()" class="bg-blue-600 px-6 py-2 rounded-2xl text-xs font-bold aura-btn">GUARDAR</button>
+                </div>
             </div>
             <div id="notes-grid" class="grid grid-cols-2 gap-3"></div>
         </section>
 
         <section id="v-rss" class="hidden space-y-4">
             <div class="glass p-4 rounded-3xl border border-blue-500/10 mb-4">
-                <input type="text" id="rss-name" placeholder="Nombre Canal" class="w-full bg-white/5 p-2 rounded-xl text-[10px] mb-2">
-                <input type="text" id="rss-url" placeholder="URL Feed" class="w-full bg-white/5 p-2 rounded-xl text-[10px] mb-3">
-                <button onclick="addRSS()" class="w-full bg-blue-600 py-2 rounded-xl text-[10px] font-bold uppercase">Añadir Feed</button>
+                <input type="text" id="rss-name" placeholder="Nombre (ej. Xataka)" class="w-full bg-white/5 p-2 rounded-xl text-[10px] mb-2 border border-white/10 outline-none">
+                <input type="text" id="rss-url" placeholder="URL Feed (https://...)" class="w-full bg-white/5 p-2 rounded-xl text-[10px] mb-3 border border-white/10 outline-none">
+                <button onclick="addRSS()" class="w-full bg-blue-600 py-2 rounded-xl text-[10px] font-bold uppercase relative z-20">Añadir a mi Feed</button>
             </div>
             <div id="rss-container" class="space-y-4"></div>
         </section>
 
-    <section id="v-data" class="hidden space-y-6">
-    <div class="glass p-4 rounded-3xl border border-purple-500/20">
-        <h3 class="text-[10px] font-black text-purple-400 mb-3 uppercase tracking-widest text-center">VICO Strategic Analyzer</h3>
-        <input type="text" id="ai-prompt" placeholder="Ej: Impacto IA en mercado inmobiliario 2026..." class="w-full bg-white/5 p-3 rounded-2xl text-xs mb-3 border border-white/10 outline-none focus:border-purple-500 transition-all">
-        <button onclick="runAnalysisIA()" class="w-full bg-purple-600 py-3 rounded-2xl text-xs font-bold aura-btn uppercase shadow-lg shadow-purple-900/20">Generar Análisis Maestro</button>
-    </div>
-
-    <div class="space-y-6">
-        <div class="glass p-4 rounded-2xl border border-white/5">
-            <p class="text-[9px] uppercase opacity-50 mb-4 text-center">Distribución de Impacto (%)</p>
-            <canvas id="chartDoughnut" style="max-height: 200px;"></canvas>
-        </div>
-
-        <div class="glass p-4 rounded-2xl border border-white/5">
-            <p class="text-[9px] uppercase opacity-50 mb-4 text-center">Comparativa de Variables</p>
-            <canvas id="chartBar" style="max-height: 200px;"></canvas>
-        </div>
-
-        <div class="glass p-4 rounded-2xl border border-white/5">
-            <p class="text-[9px] uppercase opacity-50 mb-4 text-center">Predicción de Fluctuación (Market Trend)</p>
-            <canvas id="chartLine" style="max-height: 200px;"></canvas>
-        </div>
-
-        <div id="ai-report" class="glass p-5 rounded-2xl text-[10px] leading-relaxed hidden border-l-4 border-purple-500 bg-gradient-to-br from-purple-500/5 to-transparent">
+        <section id="v-data" class="hidden space-y-6">
+            <div class="glass p-4 rounded-3xl border border-purple-500/20">
+                <input type="text" id="ai-prompt" placeholder="Ej: Fluctuación del litio en 2026..." class="w-full bg-white/5 p-3 rounded-2xl text-xs mb-3 border border-white/10 outline-none">
+                <button onclick="runAnalysisIA()" class="w-full bg-purple-600 py-3 rounded-2xl text-xs font-bold aura-btn uppercase relative z-20">Generar Análisis Maestro</button>
             </div>
-    </div>
-</section>
+            <div class="space-y-6">
+                <div class="glass p-4 rounded-2xl"><canvas id="chartDoughnut" style="max-height: 180px;"></canvas></div>
+                <div class="glass p-4 rounded-2xl"><canvas id="chartBar" style="max-height: 180px;"></canvas></div>
+                <div class="glass p-4 rounded-2xl">
+                    <p class="text-[9px] uppercase opacity-50 mb-2 text-center">Predicción Bolsa/Tendencia</p>
+                    <canvas id="chartLine" style="max-height: 180px;"></canvas>
+                </div>
+                <div id="ai-report" class="glass p-5 rounded-2xl text-[10px] leading-relaxed hidden border-l-4 border-purple-500"></div>
+            </div>
+        </section>
     </main>
 
     <div id="ai-chat-container" class="fixed bottom-28 right-6 chat-box glass rounded-3xl shadow-2xl border-blue-500/30 overflow-hidden">
-        <div class="bg-blue-600 p-3 flex justify-between items-center">
-            <span class="text-[10px] font-black italic uppercase">Vico Agentic Chat</span>
-            <button onclick="toggleElement('ai-chat-container')">&times;</button>
+        <div class="bg-blue-600 p-2 flex justify-around">
+            <button onclick="chatMode='libre'; updateModeUI()" id="mode-libre" class="text-[8px] font-bold uppercase px-4 py-1 rounded-full bg-white/20">Modo Libre</button>
+            <button onclick="chatMode='pro'; updateModeUI()" id="mode-pro" class="text-[8px] font-bold uppercase px-4 py-1 rounded-full opacity-50">Modo Pro</button>
         </div>
         <div id="chat-content" class="flex-1 p-3 overflow-y-auto text-[10px] space-y-2"></div>
         <div class="p-2 border-t border-white/10 flex gap-2">
-            <input type="text" id="chat-msg" class="flex-1 bg-black/40 p-2 rounded-xl text-[10px] outline-none" placeholder="Pregunta algo...">
+            <input type="text" id="chat-msg" class="flex-1 bg-black/40 p-2 rounded-xl text-[10px] outline-none" placeholder="Escribe al agente...">
             <button onclick="sendChatIA()" class="bg-blue-600 px-3 rounded-xl"><i class="fa-solid fa-paper-plane"></i></button>
-        </div>
-    </div>
-
-    <div id="profile-modal" class="modal-full">
-        <div class="flex justify-between items-center mb-8">
-            <h2 class="text-2xl font-black italic text-blue-500">CONFIGURACIÓN</h2>
-            <button onclick="closeProfile()" class="text-3xl">&times;</button>
-        </div>
-        <div class="space-y-6">
-            <div class="glass p-5 rounded-3xl border-l-4 border-yellow-500">
-                <h4 class="text-[10px] font-bold mb-2 uppercase text-yellow-500">IA Intelligence API</h4>
-                <input type="password" id="api-key-input" placeholder="Pega tu Key de Gemini o Groq..." class="w-full bg-black/50 p-3 rounded-2xl text-xs border border-white/10 mt-2">
-                <button onclick="saveSettings()" class="w-full bg-blue-600 py-3 rounded-xl mt-3 font-bold text-xs aura-btn uppercase">Guardar Cerebro</button>
-            </div>
-
-            <div class="flex justify-between items-center glass p-4 rounded-3xl">
-                <span class="text-xs font-bold uppercase">Sonidos UX</span>
-                <input type="checkbox" id="sound-toggle" class="w-6 h-6 accent-blue-500" checked>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="changeTheme('gold')" class="gold-grad p-4 rounded-3xl text-xs font-bold uppercase">Gold Edition</button>
-                <button onclick="changeTheme('cyber')" class="cyber-grad p-4 rounded-3xl text-xs font-bold uppercase">Cyber Aura</button>
-            </div>
-
-            <div class="glass p-4 rounded-3xl border border-blue-500/20">
-                <h4 class="text-[10px] font-bold mb-3 uppercase text-blue-400">Creador de Botones Pro</h4>
-                <input type="text" id="btn-label" placeholder="Título..." class="w-full bg-black/40 p-2 rounded-xl text-xs mb-2">
-                <input type="text" id="btn-url" placeholder="URL..." class="w-full bg-black/40 p-2 rounded-xl text-xs mb-3">
-                <button onclick="createNewButton()" class="w-full bg-blue-600 py-2 rounded-xl text-[10px] font-bold aura-btn uppercase">Generar Botón</button>
-            </div>
-
-            <button onclick="window.open('https://www.paypal.me/texiduvi')" class="w-full bg-yellow-500 text-black py-4 rounded-3xl font-black uppercase aura-btn">Invitarme un café ☕</button>
-            <button onclick="clearVicoCache()" class="w-full bg-red-600/20 text-red-400 py-2 rounded-xl text-[10px] font-bold uppercase mt-6">Limpiar Caché App</button>
         </div>
     </div>
 
@@ -184,126 +146,113 @@
         <button onclick="openProfile()" class="p-4 aura-btn rounded-full"><i class="fa-solid fa-id-card-clip"></i></button>
     </nav>
 
+    <div id="profile-modal" class="modal-full text-white">
+        <div class="flex justify-between items-center mb-8">
+            <h2 class="text-2xl font-black italic text-blue-500">CONFIGURACIÓN</h2>
+            <button onclick="closeProfile()" class="text-3xl">&times;</button>
+        </div>
+        <div class="space-y-4">
+            <div class="glass p-5 rounded-3xl border-l-4 border-yellow-500">
+                <h4 class="text-[10px] font-bold mb-2 uppercase">API KEY MASTER (GEMINI/GROQ)</h4>
+                <input type="password" id="api-key-input" placeholder="Pega tu clave aquí..." class="w-full bg-black/50 p-3 rounded-2xl text-xs border border-white/10">
+                <button onclick="saveSettings()" class="w-full bg-blue-600 py-3 rounded-xl mt-3 font-bold text-xs uppercase">Sincronizar Cerebro</button>
+            </div>
+            <button onclick="window.open('https://www.paypal.me/texiduvi')" class="w-full bg-yellow-500 text-black py-4 rounded-3xl font-black uppercase">☕ Invitar Café</button>
+            <button onclick="localStorage.clear(); location.reload();" class="w-full bg-red-600/20 text-red-400 py-2 rounded-xl text-[10px] font-bold uppercase mt-10">Reset App</button>
+        </div>
+    </div>
+
     <script>
-        const MOTIVACIONES = [
-    {t: "La mejor forma de predecir el futuro es crearlo.", a: "Peter Drucker"},
-    {t: "La innovación es lo que distingue a un líder de un seguidor.", a: "Steve Jobs"},
-    {t: "Tu tiempo es limitado, no lo gastes viviendo la vida de otro.", a: "Steve Jobs"},
-    {t: "El éxito no es el final, el fracaso no es fatal.", a: "Winston Churchill"},
-    {t: "Cree que puedes y casi habrás llegado.", a: "Theodore Roosevelt"},
-    {t: "Solo una cosa hace que un sueño sea imposible: el miedo al fracaso.", a: "Paulo Coelho"},
-    {t: "Haz de cada día tu obra maestra.", a: "John Wooden"},
-    {t: "La inteligencia es la habilidad de adaptarse al cambio.", a: "Stephen Hawking"},
-    {t: "La suerte es lo que sucede cuando la preparación encuentra la oportunidad.", a: "Séneca"},
-    {t: "No busques los errores, busca un remedio.", a: "Henry Ford"},
-    {t: "Si quieres algo que nunca tuviste, haz algo que nunca hiciste.", a: "Anónimo"},
-    {t: "La excelencia no es un acto, es un hábito.", a: "Aristóteles"},
-    {t: "El conocimiento es poder.", a: "Francis Bacon"},
-    {t: "Tus clientes más insatisfechos son tu mayor fuente de aprendizaje.", a: "Bill Gates"},
-    {t: "La simplicidad es la máxima sofisticación.", a: "Leonardo da Vinci"},
-    {t: "El único lugar donde el éxito viene antes que el trabajo es en el diccionario.", a: "Vidal Sassoon"},
-    {t: "La vida es lo que pasa mientras estás ocupado haciendo otros planes.", a: "John Lennon"},
-    {t: "No cuentes los días, haz que los días cuenten.", a: "Muhammad Ali"},
-    {t: "El futuro pertenece a quienes creen en la belleza de sus sueños.", a: "Eleanor Roosevelt"},
-    {t: "VICO: Tu mente, expandida por la IA.", a: "Vico Pocket"}
-];
-
-const VICO_DIAGNOSTIC = {
-    "api_fail": "Error de conexión con la API. Verifica tu clave o internet.",
-    "json_error": "La IA devolvió un formato ilegible. Reintenta el análisis.",
-    "rss_blocked": "El servidor RSS bloqueó la petición (CORS). Intenta otro link.",
-    "storage_full": "Memoria local llena. Borra algunos links antiguos.",
-    "offline": "Modo offline activo. Algunas funciones IA no estarán disponibles."
-};
-        function iniciarCargaVico() {
-    const loadingScreen = document.getElementById('loading-screen');
-    const loadText = document.getElementById('load-text');
-    const progBar = document.getElementById('prog-bar');
-    
-    // Seleccionar frase aleatoria
-    const random = MOTIVACIONES[Math.floor(Math.random() * MOTIVACIONES.length)];
-    loadText.innerHTML = `<span class="text-blue-400">"${random.t}"</span><br><small class="opacity-50">— ${random.a}</small>`;
-
-    let progreso = 0;
-    const intervalo = setInterval(() => {
-        progreso += Math.random() * 20;
-        if (progreso >= 100) {
-            progreso = 100;
-            clearInterval(intervalo);
-            setTimeout(() => {
-                loadingScreen.style.opacity = '0';
-                setTimeout(() => loadingScreen.classList.add('hidden'), 500);
-            }, 500);
-        }
-        progBar.style.width = progreso + '%';
-    }, 150);
-}
-
-// Ejecutar al cargar la página
-window.onload = iniciarCargaVico;
-        // --- LÓGICA DE CAPTURA DE COMPARTIR ANDROID ---
-window.addEventListener('DOMContentLoaded', () => {
-    const parsedUrl = new URL(window.location);
-    // Android suele enviar el link en 'url' o en 'text'
-    const sharedTitle = parsedUrl.searchParams.get('title');
-    const sharedText = parsedUrl.searchParams.get('text');
-    const sharedUrl = parsedUrl.searchParams.get('url');
-
-    // Determinamos cuál es el link real
-    const linkFinal = sharedUrl || sharedText;
-
-    if (linkFinal) {
-        // Ejecutamos tu función de guardado
-        // He usado 'Link Externo' como etiqueta si no viene título
-        saveLinkToVico(sharedTitle || "Link Externo", linkFinal);
-
-        // LIMPIEZA: Borramos los parámetros de la URL para que si el usuario
-        // refresca la página, no se guarde el mismo link otra vez.
-        window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // Opcional: Cambiar a la pestaña de links para que el usuario vea que se guardó
-        switchTab('links');
-    }
-});
+        // ESTADO GLOBAL
         let notes = JSON.parse(localStorage.getItem('vico_notes')) || [];
+        let folders = JSON.parse(localStorage.getItem('vico_folders')) || ['General', 'Estrategia'];
         let customButtons = JSON.parse(localStorage.getItem('vico_custom_btns')) || [];
-        let chatMode = 'pro'; // Por defecto profesional
-const motivaciones = [
-    {t: "La mejor forma de predecir el futuro es crearlo.", a: "P. Drucker"},
-    {t: "El éxito es la suma de pequeños esfuerzos repetidos.", a: "R. Collier"},
-    {t: "La innovación diferencia a un líder de un seguidor.", a: "S. Jobs"},
-    // ... agrega 17 más aquí
-];
-
-// Lógica de carga
-function initVicoLoader() {
-    const random = motivaciones[Math.floor(Math.random() * motivaciones.length)];
-    document.getElementById('load-text').innerText = `"${random.t}" - ${random.a}`;
-    let prog = 0;
-    const bar = document.getElementById('prog-bar');
-    const interval = setInterval(() => {
-        prog += Math.random() * 15;
-        if(prog >= 100) {
-            prog = 100;
-            clearInterval(interval);
-            setTimeout(() => document.getElementById('loading-screen').style.display='none', 500);
-        }
-        bar.style.width = prog + '%';
-    }, 100);
-}
-initVicoLoader();
-        let rssList = JSON.parse(localStorage.getItem('vico_rss')) || [];
+        let rssList = JSON.parse(localStorage.getItem('vico_rss')) || [
+            {title: "Wired", url: "https://www.wired.com/feed/rss"},
+            {title: "Xataka", url: "https://www.xataka.com/feed/full"}
+        ];
+        let chatMode = 'pro';
         let charts = {};
+        let pomoInterval;
+        let pomoSeconds = 1500;
+
+        const MOTIVACIONES = [
+            {t: "La mejor forma de predecir el futuro es crearlo.", a: "P. Drucker"},
+            {t: "La innovación diferencia a un líder de un seguidor.", a: "S. Jobs"},
+            {t: "Hazlo simple, pero significativo.", a: "Don Draper"},
+            {t: "La inteligencia es la habilidad de adaptarse al cambio.", a: "S. Hawking"},
+            {t: "El éxito es la suma de pequeños esfuerzos repetidos.", a: "R. Collier"},
+            {t: "Cree que puedes y casi habrás llegado.", a: "T. Roosevelt"},
+            {t: "El único modo de hacer un gran trabajo es amar lo que haces.", a: "S. Jobs"},
+            {t: "La suerte es lo que sucede cuando la preparación encuentra la oportunidad.", a: "Séneca"},
+            {t: "No busques los errores, busca un remedio.", a: "H. Ford"},
+            {t: "La excelencia no es un acto, es un hábito.", a: "Aristóteles"},
+            {t: "Tus clientes más insatisfechos son tu mayor fuente de aprendizaje.", a: "B. Gates"},
+            {t: "La simplicidad es la máxima sofisticación.", a: "L. da Vinci"},
+            {t: "No cuentes los días, haz que los días cuenten.", a: "M. Ali"},
+            {t: "VICO: Tu mente, expandida por la IA.", a: "Vico Pocket"},
+            {t: "El futuro pertenece a quienes creen en la belleza de sus sueños.", a: "E. Roosevelt"},
+            {t: "El conocimiento es poder.", a: "F. Bacon"},
+            {t: "La vida es lo que pasa mientras estás ocupado haciendo otros planes.", a: "J. Lennon"},
+            {t: "Si quieres algo que nunca tuviste, haz algo que nunca hiciste.", a: "Anónimo"},
+            {t: "Haz de cada día tu obra maestra.", a: "J. Wooden"},
+            {t: "Solo una cosa hace que un sueño sea imposible: el miedo al fracaso.", a: "P. Coelho"}
+        ];
+
+        // INICIALIZACIÓN Y CARGA
+        function iniciarCargaVico() {
+            const random = MOTIVACIONES[Math.floor(Math.random() * MOTIVACIONES.length)];
+            document.getElementById('load-text').innerHTML = `"${random.t}"<br><small class="opacity-50">— ${random.a}</small>`;
+            let prog = 0;
+            const bar = document.getElementById('prog-bar');
+            const interval = setInterval(() => {
+                prog += 5;
+                bar.style.width = prog + "%";
+                if(prog >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => document.getElementById('loading-screen').style.display = 'none', 500);
+                }
+            }, 100);
+            renderFolders();
+            renderDashboard();
+            renderRSS();
+            fetchDiscoveryNews();
+            renderCustomButtons();
+            if(localStorage.getItem('vico_api_key')) document.querySelector('button[onclick="saveSettings()"]').classList.add('api-connected');
+        }
+        window.onload = iniciarCargaVico;
+
+        // POMODORO
+        function pomoControl() {
+            const btn = document.getElementById('pomo-btn');
+            if (btn.classList.contains('fa-play')) {
+                btn.classList.replace('fa-play', 'fa-pause');
+                pomoInterval = setInterval(() => {
+                    pomoSeconds--;
+                    let m = Math.floor(pomoSeconds / 60), s = pomoSeconds % 60;
+                    document.getElementById('pomo-timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+                    if (pomoSeconds <= 0) { clearInterval(pomoInterval); alert("¡Tiempo!"); }
+                }, 1000);
+            } else {
+                btn.classList.replace('fa-pause', 'fa-play');
+                clearInterval(pomoInterval);
+            }
+        }
 
         // NAVEGACIÓN
         function switchTab(tab) {
             ['home', 'links', 'notes', 'rss', 'data'].forEach(t => {
                 const el = document.getElementById(`v-${t}`);
+                const btn = document.getElementById(`btn-${t}`);
                 if(el) el.classList.add('hidden');
+                if(btn) btn.classList.replace('tab-active', 'opacity-40');
             });
             document.getElementById(`v-${tab}`).classList.remove('hidden');
+            if(document.getElementById(`btn-${tab}`)) {
+                document.getElementById(`btn-${tab}`).classList.add('tab-active');
+                document.getElementById(`btn-${tab}`).classList.remove('opacity-40');
+            }
             if(tab === 'home') renderDashboard();
-            playUX('click');
         }
 
         function toggleElement(id) {
@@ -314,35 +263,16 @@ initVicoLoader();
         function openProfile() { document.getElementById('profile-modal').style.display = 'block'; }
         function closeProfile() { document.getElementById('profile-modal').style.display = 'none'; }
 
-        // UTILIDADES UX
-        function playUX(type) {
-            if(!document.getElementById('sound-toggle').checked) return;
-            const sounds = { click: 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', pop: 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3' };
-            new Audio(sounds[type]).play().catch(()=>{});
-        }
-
-        function toggleDarkMode() { document.body.classList.toggle('light-mode'); }
-        function changeTheme(t) { document.body.className = `p-4 pb-48 ${t}-grad`; }
-
-        // LINKS & BOTONES
-        function renderCustomButtons() {
-            const container = document.getElementById('links-list');
-            container.innerHTML = customButtons.map((btn, i) => `
-                <div class="glass p-4 rounded-2xl flex items-center gap-4 border border-white/10">
-                    <img src="${btn.favicon || 'icon.png'}" class="w-10 h-10 rounded-xl bg-white/10">
-                    <div class="flex-1" onclick="window.open('${btn.url}', '_self')">
-                        <h4 class="text-[10px] font-bold text-blue-400 uppercase leading-tight">${btn.label}</h4>
-                        <p class="text-[8px] opacity-40 truncate">${btn.url}</p>
-                    </div>
-                    <button onclick="deleteLink(${i})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
-                </div>`).join('');
+        // LINKS (ESTILO KEEP)
+        function getFavicon(url) {
+            try { return `https://www.google.com/s2/favicons?sz=128&domain=${new URL(url).hostname}`; }
+            catch { return 'icon.png'; }
         }
 
         async function saveLinkToVico(label, url) {
             if(!url) return;
             if(!url.includes('http')) url = 'https://' + url;
-            const domain = new URL(url).hostname;
-            const favicon = `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
+            const favicon = getFavicon(url);
             customButtons.unshift({ label, url, favicon });
             localStorage.setItem('vico_custom_btns', JSON.stringify(customButtons));
             renderCustomButtons();
@@ -350,8 +280,29 @@ initVicoLoader();
         }
 
         function addManualLink() {
-            const val = document.getElementById('manual-url').value;
-            if(val) { saveLinkToVico('Enlace Guardado', val); document.getElementById('manual-url').value = ''; }
+            const input = document.getElementById('manual-url');
+            if(input.value) { saveLinkToVico('Enlace Guardado', input.value); input.value = ''; }
+        }
+
+        function renderCustomButtons() {
+            const container = document.getElementById('links-list');
+            container.innerHTML = customButtons.map((btn, i) => `
+                <div class="keep-card">
+                    <img src="${btn.favicon}" onerror="this.src='icon.png'">
+                    <div class="p-3">
+                        <h4 class="text-[11px] font-bold text-blue-400 uppercase truncate">${btn.label}</h4>
+                        <p class="text-[8px] opacity-40 mb-3 truncate">${btn.url}</p>
+                        <div class="flex flex-wrap gap-1 mb-3">
+                            <button onclick="askVICO('${btn.url}', 'Copywriting')" class="bg-white/5 px-2 py-1 rounded text-[7px] uppercase">Copywriting</button>
+                            <button onclick="askVICO('${btn.url}', 'SEO')" class="bg-white/5 px-2 py-1 rounded text-[7px] uppercase">SEO</button>
+                            <button onclick="askVICO('${btn.url}', 'Persuasión')" class="bg-white/5 px-2 py-1 rounded text-[7px] uppercase">Persuasión</button>
+                        </div>
+                        <div class="flex justify-between border-t border-white/5 pt-2">
+                            <button onclick="window.open('${btn.url}', '_blank')" class="text-blue-400 text-[10px]"><i class="fa-solid fa-up-right-from-square"></i></button>
+                            <button onclick="deleteLink(${i})" class="text-red-500 text-[10px]"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>
+                </div>`).join('');
         }
 
         function deleteLink(i) {
@@ -361,66 +312,83 @@ initVicoLoader();
             renderDashboard();
         }
 
-        function createNewButton() {
-            const label = document.getElementById('btn-label').value;
-            const url = document.getElementById('btn-url').value;
-            if(label && url) { saveLinkToVico(label, url); document.getElementById('btn-label').value = ''; document.getElementById('btn-url').value = ''; }
+        // NOTAS Y CARPETAS
+        function createFolder() {
+            const val = document.getElementById('folder-input').value.trim();
+            if(val && !folders.includes(val)) {
+                folders.push(val);
+                localStorage.setItem('vico_folders', JSON.stringify(folders));
+                renderFolders();
+                document.getElementById('folder-input').value = '';
+            }
         }
 
-        // NOTAS
+        function renderFolders() {
+            const select = document.getElementById('folder-target');
+            select.innerHTML = folders.map(f => `<option value="${f}">${f}</option>`).join('');
+        }
+
         function saveNote() {
             const body = document.getElementById('note-input').value;
+            const folder = document.getElementById('folder-target').value;
             if(body) {
-                notes.push({ body });
+                notes.push({ body, folder });
                 localStorage.setItem('vico_notes', JSON.stringify(notes));
                 document.getElementById('note-input').value = '';
                 renderNotes();
                 renderDashboard();
-                playUX('pop');
             }
         }
 
         function renderNotes() {
-            document.getElementById('notes-grid').innerHTML = notes.map(n => `<div class="glass p-3 rounded-2xl border-l-4 border-blue-500 text-[10px]">${n.body}</div>`).join('');
+            document.getElementById('notes-grid').innerHTML = notes.map(n => `<div class="glass p-3 rounded-2xl border-l-4 border-blue-500 text-[10px]"><p class="opacity-50 text-[7px] uppercase mb-1">${n.folder}</p>${n.body}</div>`).join('');
         }
 
-        // DASHBOARD & DISCOVERY
-        function renderDashboard() {
-            document.getElementById('dash-notes-count').innerText = notes.length;
-            document.getElementById('dash-links-count').innerText = customButtons.length;
+        // DISCOVERY
+        async function fetchDiscoveryNews() {
+            const container = document.getElementById('tech-discovery');
+            try {
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.wired.com/feed/rss`);
+                const data = await res.json();
+                container.innerHTML = '<h3 class="text-[11px] font-black text-purple-400 uppercase">Discovery: Tech & IA</h3>' + 
+                    data.items.slice(0, 4).map(item => `
+                    <div class="keep-card" onclick="window.open('${item.link}', '_blank')">
+                        <img src="${item.thumbnail || getFavicon(item.link)}">
+                        <div class="p-3">
+                            <h4 class="text-[10px] font-bold text-white leading-tight uppercase mb-1">${item.title}</h4>
+                            <p class="text-[9px] opacity-60 line-clamp-4">${item.description.replace(/<[^>]*>?/gm, '')}</p>
+                        </div>
+                    </div>`).join('');
+            } catch (e) { container.innerHTML = "Error de red."; }
         }
 
-      // REPARACIÓN RSS (Asegúrate que el botón tenga onclick="addRSS()")
-function addRSS() {
-    const name = document.getElementById('rss-name').value;
-    const url = document.getElementById('rss-url').value;
-    if(name && url) {
-        rssList.push({title: name, url: url});
-        localStorage.setItem('vico_rss', JSON.stringify(rssList));
-        renderRSS();
-        document.getElementById('rss-name').value = '';
-        document.getElementById('rss-url').value = '';
-        alert("Feed añadido!");
-    }
-}
+        // RSS
+        function addRSS() {
+            const name = document.getElementById('rss-name').value;
+            const url = document.getElementById('rss-url').value;
+            if(name && url) {
+                rssList.push({title: name, url: url});
+                localStorage.setItem('vico_rss', JSON.stringify(rssList));
+                renderRSS();
+                document.getElementById('rss-name').value = '';
+                document.getElementById('rss-url').value = '';
+            }
+        }
 
-// DISCOVERY con 4 líneas de resumen
-async function fetchDiscoveryNews() {
-    const container = document.getElementById('tech-discovery');
-    try {
-        const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.wired.com/feed/rss`);
-        const data = await res.json();
-        container.innerHTML = data.items.slice(0, 4).map(item => `
-            <div class="keep-card mb-4" onclick="window.open('${item.link}', '_blank')">
-                <img src="${item.thumbnail || getFavicon(item.link)}">
-                <div class="p-3">
-                    <h4 class="text-[10px] font-bold text-white mb-1 uppercase">${item.title}</h4>
-                    <p class="text-[9px] opacity-60 line-clamp-4">${item.description.replace(/<[^>]*>?/gm, '')}</p>
-                </div>
-            </div>`).join('');
-    } catch (e) { container.innerHTML = "Error cargando noticias."; }
-}
-        // CHAT MULTI-API MASTER
+        function renderRSS() {
+            document.getElementById('rss-container').innerHTML = rssList.map((item, i) => `
+                <div class="glass p-4 rounded-2xl flex justify-between items-center border-l-4 border-blue-500">
+                    <div onclick="window.open('${item.url}','_blank')"><h4 class="text-[10px] font-bold uppercase">${item.title}</h4></div>
+                    <button onclick="rssList.splice(${i},1);renderRSS();localStorage.setItem('vico_rss', JSON.stringify(rssList))" class="text-red-400"><i class="fa-solid fa-trash"></i></button>
+                </div>`).join('');
+        }
+
+        // CHAT MULTI-MODE
+        function updateModeUI() {
+            document.getElementById('mode-libre').classList.toggle('opacity-50', chatMode === 'pro');
+            document.getElementById('mode-pro').classList.toggle('opacity-50', chatMode === 'libre');
+        }
+
         async function sendChatIA() {
             const msgInput = document.getElementById('chat-msg');
             const chatContent = document.getElementById('chat-content');
@@ -431,35 +399,24 @@ async function fetchDiscoveryNews() {
             chatContent.innerHTML += `<p class="bg-blue-600/20 p-2 rounded-xl text-right">Tú: ${text}</p>`;
             msgInput.value = '';
 
-            const isGemini = userKey.startsWith('AIza');
-            const prompt = `Eres VICO (agente de AndyJavico). Responde breve: ${text}`;
+            let context = chatMode === 'pro' ? 
+                "Eres VICO PROFESSIONAL. Experto administrativo, formal, analítico y asistente de AndyJavico." : 
+                "Eres VICO LIBRE. Ingenioso, brillante y un poco sarcástico.";
 
             try {
-                let aiResponse = "";
-                if (isGemini) {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${userKey}`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-                    });
-                    const data = await res.json();
-                    aiResponse = data.candidates[0].content.parts[0].text;
-                } else {
-                    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${userKey}`},
-                        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role: "user", content: prompt}] })
-                    });
-                    const data = await res.json();
-                    aiResponse = data.choices[0].message.content;
-                }
+                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${userKey}`},
+                    body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role: "system", content: context}, {role: "user", content: text}] })
+                });
+                const result = await res.json();
+                const aiResponse = result.choices[0].message.content;
                 chatContent.innerHTML += `<div class="bg-white/5 p-2 rounded-xl border-l-2 border-blue-500 mt-2">VICO: ${aiResponse}</div>`;
                 chatContent.scrollTop = chatContent.scrollHeight;
-                playUX('pop');
-            } catch (e) { chatContent.innerHTML += `<p class="text-red-400">Sin conexión...</p>`; }
+            } catch (e) { chatContent.innerHTML += `<p class="text-red-400 text-[8px]">Error de API.</p>`; }
         }
 
-        // ANÁLISIS IA & GRÁFICAS
+        // ANÁLISIS MAESTRO
         async function runAnalysisIA() {
             const promptText = document.getElementById('ai-prompt').value;
             const userKey = localStorage.getItem('vico_api_key');
@@ -467,191 +424,72 @@ async function fetchDiscoveryNews() {
             if(!promptText || !userKey) return;
 
             reportDiv.classList.remove('hidden');
-// Actualizamos gráficas enviando todo el objeto
-updateCharts(dataIA);
-            // Dentro de tu lógica de actualización de gráficos:
-function updateCharts(dataIA) {
-    // ... (tus gráficos anteriores de Donas y Barras)
+            reportDiv.innerHTML = `<p class="animate-pulse text-purple-400 text-center">Analizando tendencias 2026...</p>`;
 
-    // GRÁFICO DE BOLSA (LÍNEAS)
-    const ctxLine = document.getElementById('chartLine').getContext('2d');
-    if (window.vicoChartLine) window.vicoChartLine.destroy();
+            const command = `Genera un análisis de: "${promptText}". Responde solo JSON puro: {
+                "labels": ["Fase 1", "Fase 2", "Fase 3"],
+                "data": [35, 45, 20],
+                "bolsa_labels": ["10:00", "12:00", "14:00", "16:00", "18:00", "20:00"],
+                "bolsa_data": [50, 55, 48, 62, 59, 70],
+                "excel": {"zona": "Global", "crecimiento": "+12%", "riesgo": "Bajo"},
+                "analisis": "<h2>Informe</h2> El mercado de <b>${promptText}</b>...",
+                "refs": ["https://wired.com", "https://xataka.com"]
+            }`;
 
-    window.vicoChartLine = new Chart(ctxLine, {
-        type: 'line',
-        data: {
-            labels: dataIA.bolsa_labels, // Ejemplo: ["1h", "6h", "12h", "1d", "1w", "1m"]
-            datasets: [{
-                label: 'Fluctuación Predictiva',
-                data: dataIA.bolsa_data, // Valores numéricos de la IA
-                borderColor: '#22c55e',
-                backgroundColor: 'rgba(34, 197, 94, 0.1)',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4,
-                pointRadius: 4,
-                pointBackgroundColor: '#22c55e'
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { display: true, grid: { color: 'rgba(255,255,255,0.05)' } },
-                x: { display: true, grid: { display: false } }
-            },
-            plugins: {
-                legend: { display: false }
-            }
-        }
-    });
-}
-
-// Renderizado del reporte con detalles técnicos y botón pro
-reportDiv.innerHTML = `
-    <div class="space-y-4 text-left">
-        <h2 class="text-blue-400 font-black text-sm uppercase">VICO EXECUTIVE REPORT</h2>
-        
-        <div class="grid grid-cols-2 gap-2 bg-white/5 p-3 rounded-xl border border-white/10 text-[9px]">
-            <div class="opacity-50">UBICACIÓN:</div><div class="font-bold text-blue-300">${dataIA.excel_detalles.ubicacion}</div>
-            <div class="opacity-50">VARIABLES:</div><div class="font-bold">${dataIA.excel_detalles.variables}</div>
-            <div class="opacity-50">CRECIMIENTO:</div><div class="font-bold text-green-400">${dataIA.excel_detalles.crecimiento}</div>
-            <div class="opacity-50">RIESGO:</div><div class="font-bold text-red-400">${dataIA.excel_detalles.riesgo}</div>
-        </div>
-
-        <div class="prose prose-invert text-[10px]">
-            ${dataIA.analisis}
-        </div>
-
-        <button onclick="extendResumenPro('${promptText}')" class="w-full bg-blue-600 py-3 rounded-xl font-black text-[9px] uppercase shadow-lg shadow-blue-900/20">
-            <i class="fa-solid fa-file-invoice"></i> Extender a 2000 caracteres
-        </button>
-
-        <p class="font-bold text-purple-400 mt-4 italic text-[9px]">FUENTES:</p>
-        <ul class="text-[8px] opacity-60">${dataIA.refs.map(r => `<li><a href="${r}" target="_blank">${r}</a></li>`).join('')}</ul>
-    </div>
-`;
-const command = `Actúa como analista financiero y experto en marketing. Analiza: "${promptText}". 
-Responde ÚNICAMENTE con un JSON puro con: 
-labels: [3 categorías], 
-data: [3 números sumen 100], 
-bolsa_labels: [6 fechas/horas futuras], 
-bolsa_data: [6 valores de tendencia fluctuante], 
-excel_detalles: {ubicacion: "país/ciudad", variables: "4 datos técnicos clave", crecimiento: "%", riesgo: "nivel"}, 
-analisis: "Texto detallado con H2, H3 y Negritas", 
-refs: [2 urls]`;
             try {
-                let dataIA;
-                if (userKey.startsWith('AIza')) {
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${userKey}`, {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ contents: [{ parts: [{ text: command }] }] })
-                    });
-                    const result = await res.json();
-                    dataIA = JSON.parse(result.candidates[0].content.parts[0].text.replace(/```json|```/g, ''));
-                } else {
-                    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${userKey}`},
-                        body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role: "user", content: command}] })
-                    });
-                    const result = await res.json();
-                    dataIA = JSON.parse(result.choices[0].message.content.replace(/```json|```/g, ''));
-                }
+                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json', 'Authorization': `Bearer ${userKey}`},
+                    body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role: "user", content: command}] })
+                });
+                const result = await res.json();
+                const dataIA = JSON.parse(result.choices[0].message.content.replace(/```json|```/g, ''));
 
-                updateCharts(dataIA.labels, dataIA.data);
-                reportDiv.innerHTML = `<p class="font-black text-blue-400 mb-2">VICO ANALYSIS REPORT</p><p class="mb-4">${dataIA.analisis}</p><p class="font-bold text-purple-400 mb-1 italic text-[9px]">REFERENCIAS:</p><ul>${dataIA.refs.map(r => `<li><a href="${r}" target="_blank" class="underline opacity-60">${r}</a></li>`).join('')}</ul>`;
-            } catch (e) { reportDiv.innerHTML = "Error en el procesamiento IA."; }
+                updateCharts(dataIA);
+                reportDiv.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-3 gap-2 bg-white/5 p-2 rounded-xl text-[8px] uppercase text-center font-bold">
+                            <div class="text-blue-400">ZONA<br>${dataIA.excel.zona}</div>
+                            <div class="text-green-400">CREC.<br>${dataIA.excel.crecimiento}</div>
+                            <div class="text-red-400">RIESGO<br>${dataIA.excel.riesgo}</div>
+                        </div>
+                        <div class="text-left text-[9px]">${dataIA.analisis}</div>
+                        <button onclick="extendResumenPro('${promptText}')" class="w-full bg-blue-600 py-2 rounded-xl font-black text-[9px] uppercase">Extender Resumen</button>
+                    </div>`;
+            } catch (e) { reportDiv.innerHTML = "Error en JSON."; }
         }
 
-function updateCharts(dataIA) {
-    const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#22c55e', '#f59e0b'];
-    
-    // 1. Gráfico Circular (Doughnut) - Porcentajes
-    if(charts.doughnut) charts.doughnut.destroy();
-    charts.doughnut = new Chart(document.getElementById('chartDoughnut'), {
-        type: 'doughnut',
-        data: { labels: dataIA.labels, datasets: [{ data: dataIA.data, backgroundColor: colors }] },
-        options: { plugins: { legend: { display: false } }, cutout: '70%' }
-    });
+        function updateCharts(dataIA) {
+            const colors = ['#3b82f6', '#8b5cf6', '#ec4899'];
+            if(charts.doughnut) charts.doughnut.destroy();
+            charts.doughnut = new Chart(document.getElementById('chartDoughnut'), {
+                type: 'doughnut',
+                data: { labels: dataIA.labels, datasets: [{ data: dataIA.data, backgroundColor: colors }] },
+                options: { cutout: '75%', plugins: { legend: { display: false } } }
+            });
+            if(charts.bar) charts.bar.destroy();
+            charts.bar = new Chart(document.getElementById('chartBar'), {
+                type: 'bar',
+                data: { labels: dataIA.labels, datasets: [{ label: '%', data: dataIA.data, backgroundColor: colors[1] }] },
+                options: { plugins: { legend: { display: false } } }
+            });
+            if(charts.line) charts.line.destroy();
+            charts.line = new Chart(document.getElementById('chartLine'), {
+                type: 'line',
+                data: { labels: dataIA.bolsa_labels, datasets: [{ data: dataIA.bolsa_data, borderColor: '#22c55e', tension: 0.4, fill: true, backgroundColor: 'rgba(34,197,94,0.1)' }] },
+                options: { plugins: { legend: { display: false } } }
+            });
+        }
 
-    // 2. Gráfico de Barras - Comparativa
-    if(charts.bar) charts.bar.destroy();
-    charts.bar = new Chart(document.getElementById('chartBar'), {
-        type: 'bar',
-        data: { labels: dataIA.labels, datasets: [{ label: 'Impacto %', data: dataIA.data, backgroundColor: colors[1] }] },
-        options: { plugins: { legend: { display: false } } }
-    });
+        function renderDashboard() {
+            document.getElementById('dash-notes-count').innerText = notes.length;
+            document.getElementById('dash-links-count').innerText = customButtons.length;
+        }
 
-    // 3. Gráfico de Líneas - Predicción Bolsa/Tendencia
-    if(charts.line) charts.line.destroy();
-    charts.line = new Chart(document.getElementById('chartLine'), {
-        type: 'line',
-        data: { 
-            labels: dataIA.bolsa_labels, 
-            datasets: [{ 
-                label: 'Fluctuación Estimada', 
-                data: dataIA.bolsa_data, 
-                borderColor: '#22c55e', 
-                backgroundColor: 'rgba(34, 197, 94, 0.1)', 
-                fill: true,
-                tension: 0.4 
-            }] 
-        },
-        options: { scales: { y: { beginAtZero: false } } }
-    });
-}
-
-        // CONFIG
         function saveSettings() {
             localStorage.setItem('vico_api_key', document.getElementById('api-key-input').value);
-            alert("Sincronizado Admin.");
-            location.reload();
+            alert("Cerebro activado."); location.reload();
         }
-
-        function clearVicoCache() { localStorage.clear(); location.reload(); }
-
-        window.addEventListener('DOMContentLoaded', () => {
-            renderCustomButtons();
-            renderNotes();
-            renderDashboard();
-            fetchDiscoveryNews();
-            if(localStorage.getItem('vico_api_key')) document.querySelector('button[onclick="saveSettings()"]').classList.add('api-connected');
-        });
-        const vicoErrors = {
-    "auth": "API Key incorrecta. Revisa el Perfil.",
-    "rate_limit": "Demasiadas peticiones. Groq está descansando.",
-    "network": "Sin internet o VPN bloqueada.",
-    "json": "Error en formato de datos IA."
-};
-
-function handleVicoError(type) {
-    const solution = vicoErrors[type] || "Error desconocido. Reinicia la App.";
-    const errorHTML = `
-        <div class="bg-red-600/20 border border-red-500 p-3 rounded-2xl text-[9px] mt-4">
-            <p class="font-bold">⚠️ VICO ERROR DETECTADO</p>
-            <p>${solution}</p>
-        </div>
-    `;
-    document.getElementById('chat-content').innerHTML += errorHTML;
-}
-        async function extendResumenPro(originalPrompt) {
-    const reportDiv = document.getElementById('ai-report');
-    const userKey = localStorage.getItem('vico_api_key');
-    
-    reportDiv.innerHTML += `<p class="text-blue-400 animate-pulse mt-4">Redactando informe extenso (2000 carac)...</p>`;
-
-    const extendCommand = `Redacta un artículo de periódico digital exhaustivo sobre "${originalPrompt}". Usa H2, H3, negritas y listas. Extensión mínima 1800 caracteres. Formato HTML.`;
-
-    try {
-        let longText = "";
-        // Reutilizamos la lógica de fetch que ya tienes para Groq o Gemini...
-        // (Por brevedad, asumo que usas la lógica Multi-API aquí)
-        // Al final:
-        reportDiv.innerHTML = `<div class="text-left bg-black/20 p-4 rounded-3xl border border-white/5">${longText}</div>`;
-        reportDiv.scrollIntoView({ behavior: 'smooth' });
-    } catch (e) { alert("Error al extender."); }
-}
     </script>
 </body>
 </html>
