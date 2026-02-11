@@ -185,6 +185,62 @@
     </nav>
 
     <script>
+        const MOTIVACIONES = [
+    {t: "La mejor forma de predecir el futuro es crearlo.", a: "Peter Drucker"},
+    {t: "La innovación es lo que distingue a un líder de un seguidor.", a: "Steve Jobs"},
+    {t: "Tu tiempo es limitado, no lo gastes viviendo la vida de otro.", a: "Steve Jobs"},
+    {t: "El éxito no es el final, el fracaso no es fatal.", a: "Winston Churchill"},
+    {t: "Cree que puedes y casi habrás llegado.", a: "Theodore Roosevelt"},
+    {t: "Solo una cosa hace que un sueño sea imposible: el miedo al fracaso.", a: "Paulo Coelho"},
+    {t: "Haz de cada día tu obra maestra.", a: "John Wooden"},
+    {t: "La inteligencia es la habilidad de adaptarse al cambio.", a: "Stephen Hawking"},
+    {t: "La suerte es lo que sucede cuando la preparación encuentra la oportunidad.", a: "Séneca"},
+    {t: "No busques los errores, busca un remedio.", a: "Henry Ford"},
+    {t: "Si quieres algo que nunca tuviste, haz algo que nunca hiciste.", a: "Anónimo"},
+    {t: "La excelencia no es un acto, es un hábito.", a: "Aristóteles"},
+    {t: "El conocimiento es poder.", a: "Francis Bacon"},
+    {t: "Tus clientes más insatisfechos son tu mayor fuente de aprendizaje.", a: "Bill Gates"},
+    {t: "La simplicidad es la máxima sofisticación.", a: "Leonardo da Vinci"},
+    {t: "El único lugar donde el éxito viene antes que el trabajo es en el diccionario.", a: "Vidal Sassoon"},
+    {t: "La vida es lo que pasa mientras estás ocupado haciendo otros planes.", a: "John Lennon"},
+    {t: "No cuentes los días, haz que los días cuenten.", a: "Muhammad Ali"},
+    {t: "El futuro pertenece a quienes creen en la belleza de sus sueños.", a: "Eleanor Roosevelt"},
+    {t: "VICO: Tu mente, expandida por la IA.", a: "Vico Pocket"}
+];
+
+const VICO_DIAGNOSTIC = {
+    "api_fail": "Error de conexión con la API. Verifica tu clave o internet.",
+    "json_error": "La IA devolvió un formato ilegible. Reintenta el análisis.",
+    "rss_blocked": "El servidor RSS bloqueó la petición (CORS). Intenta otro link.",
+    "storage_full": "Memoria local llena. Borra algunos links antiguos.",
+    "offline": "Modo offline activo. Algunas funciones IA no estarán disponibles."
+};
+        function iniciarCargaVico() {
+    const loadingScreen = document.getElementById('loading-screen');
+    const loadText = document.getElementById('load-text');
+    const progBar = document.getElementById('prog-bar');
+    
+    // Seleccionar frase aleatoria
+    const random = MOTIVACIONES[Math.floor(Math.random() * MOTIVACIONES.length)];
+    loadText.innerHTML = `<span class="text-blue-400">"${random.t}"</span><br><small class="opacity-50">— ${random.a}</small>`;
+
+    let progreso = 0;
+    const intervalo = setInterval(() => {
+        progreso += Math.random() * 20;
+        if (progreso >= 100) {
+            progreso = 100;
+            clearInterval(intervalo);
+            setTimeout(() => {
+                loadingScreen.style.opacity = '0';
+                setTimeout(() => loadingScreen.classList.add('hidden'), 500);
+            }, 500);
+        }
+        progBar.style.width = progreso + '%';
+    }, 150);
+}
+
+// Ejecutar al cargar la página
+window.onload = iniciarCargaVico;
         // --- LÓGICA DE CAPTURA DE COMPARTIR ANDROID ---
 window.addEventListener('DOMContentLoaded', () => {
     const parsedUrl = new URL(window.location);
@@ -413,6 +469,42 @@ async function fetchDiscoveryNews() {
             reportDiv.classList.remove('hidden');
 // Actualizamos gráficas enviando todo el objeto
 updateCharts(dataIA);
+            // Dentro de tu lógica de actualización de gráficos:
+function updateCharts(dataIA) {
+    // ... (tus gráficos anteriores de Donas y Barras)
+
+    // GRÁFICO DE BOLSA (LÍNEAS)
+    const ctxLine = document.getElementById('chartLine').getContext('2d');
+    if (window.vicoChartLine) window.vicoChartLine.destroy();
+
+    window.vicoChartLine = new Chart(ctxLine, {
+        type: 'line',
+        data: {
+            labels: dataIA.bolsa_labels, // Ejemplo: ["1h", "6h", "12h", "1d", "1w", "1m"]
+            datasets: [{
+                label: 'Fluctuación Predictiva',
+                data: dataIA.bolsa_data, // Valores numéricos de la IA
+                borderColor: '#22c55e',
+                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#22c55e'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { display: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+                x: { display: true, grid: { display: false } }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+}
 
 // Renderizado del reporte con detalles técnicos y botón pro
 reportDiv.innerHTML = `
