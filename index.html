@@ -203,16 +203,21 @@
             if(localStorage.getItem('vico_api_key')) document.querySelector('button[onclick="saveSettings()"]').classList.add('api-connected');
         };
 
-        function switchTab(t) {
-            ['home', 'links', 'notes', 'rss', 'data'].forEach(id => {
-                document.getElementById(`v-${id}`).classList.add('hidden');
-                document.getElementById(`btn-${id}`)?.classList.replace('tab-active', 'opacity-40');
-            });
-            document.getElementById(`v-${t}`).classList.remove('hidden');
-            document.getElementById(`btn-${t}`)?.classList.add('tab-active');
-            if(t === 'home') renderDashboard();
-            playUX('click');
-        }
+    function switchTab(tab) {
+    ['home', 'links', 'notes', 'rss', 'data'].forEach(t => {
+        document.getElementById(`v-${t}`).classList.add('hidden');
+        document.getElementById(`btn-${t}`)?.classList.replace('tab-active', 'opacity-40');
+    });
+    
+    document.getElementById(`v-${tab}`).classList.remove('hidden');
+    document.getElementById(`btn-${tab}`)?.classList.add('tab-active');
+    
+    // REPARACIÓN: Renderizar carpetas y dashboard al entrar
+    if (tab === 'notes') renderFolders();
+    if (tab === 'home') renderDashboard();
+    
+    playUX('click');
+}
 
         function toggleElement(id) { const el = document.getElementById(id); el.style.display = (el.style.display === 'flex') ? 'none' : 'flex'; }
         function openProfile() { document.getElementById('profile-modal').style.display='block'; document.body.classList.add('modal-open'); }
