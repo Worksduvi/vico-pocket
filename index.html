@@ -3,22 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VICO POCKET ELITE v9.7</title>
+    <title>VICO POCKET ELITE v9.8</title>
     <link rel="manifest" href="manifest.json">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --vbg: #0b0f1a; --vacc: #3b82f6; --vtxt: #e2e8f0; }
-        body { background: var(--vbg); color: var(--vtxt); font-family: 'Inter', sans-serif; margin: 0; transition: 0.3s; overflow-x: hidden; }
+        body { background: var(--vbg); color: var(--vtxt); font-family: 'Inter', sans-serif; transition: 0.3s; overflow-x: hidden; }
         body.light-mode { --vbg: #f8fafc; --vtxt: #0f172a; --vacc: #2563eb; }
         main { padding-bottom: 160px; position: relative; z-index: 1; }
         header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .vico-brand { font-weight: 900; font-style: italic; color: var(--vacc); font-size: 1.3rem; }
-        .link-card { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 15px; margin-bottom: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .link-card { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.03); padding: 10px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.05); }
         .link-card img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; background: #161b22; }
         .chat-box { width: 92%; max-width: 350px; height: 500px; position: fixed; bottom: 110px; right: 4%; display: none; flex-direction: column; z-index: 99999; background: rgba(11, 15, 26, 0.98); backdrop-filter: blur(20px); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 24px; overflow: hidden; }
-        .note-card { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 15px; border-left: 3px solid var(--vacc); cursor: pointer; margin-bottom: 8px; }
+        .note-card { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 15px; border-left: 3px solid var(--ncolor, var(--vacc)); cursor: pointer; margin-bottom: 8px; }
         .note-preview { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font-size: 11px; opacity: 0.7; }
         .note-full { display: none; font-size: 11px; margin-top: 5px; }
         .note-card.expanded .note-preview { display: none; }
@@ -38,8 +38,11 @@
     <div id="save-confirm"><i class="fa-solid fa-check-circle"></i> <span id="save-msg">GUARDADO</span></div>
 
     <header class="fixed top-0 left-0 w-full glass z-[5000]">
-        <div class="vico-brand">VICO POCKET <span class="text-[9px] border border-blue-500 px-1 italic">ELITE</span></div>
-        <div class="flex gap-3 items-center">
+        <div class="vico-brand text-left">VICO POCKET <span class="text-[9px] border border-blue-500 px-1 italic">ELITE</span></div>
+        <div class="flex gap-4 items-center">
+            <select id="lang-sel" onchange="translateApp()" class="bg-transparent text-[10px] font-black outline-none border-none uppercase">
+                <option value="es">ES</option><option value="en">EN</option><option value="zh">ZH</option><option value="fil">FIL</option><option value="hi">HI</option><option value="ms">MS</option>
+            </select>
             <button onclick="toggleElement('ai-chat-container')" class="text-blue-400 text-lg"><i class="fa-solid fa-robot"></i></button>
             <button onclick="toggleDark()" class="text-lg"><i class="fa-solid fa-moon"></i></button>
         </div>
@@ -50,6 +53,7 @@
         <button onclick="switchTab('links')" id="btn-links" class="opacity-40">Links🔗</button>
         <button onclick="switchTab('notes')" id="btn-notes" class="opacity-40">Notas📝</button>
         <button onclick="switchTab('data')" id="btn-data" class="opacity-40">Análisis🪄</button>
+        <button onclick="switchTab('rss')" id="btn-rss" class="opacity-40">RSS📰</button>
         <button onclick="switchTab('calendar')" id="btn-calendar" class="opacity-40">📅</button>
     </nav>
 
@@ -57,8 +61,8 @@
         <section id="v-home">
             <div id="top-phrase" class="glass p-4 rounded-3xl mb-6 text-[11px] italic text-blue-300 text-center border-l-4 border-blue-500"></div>
             <div class="flex justify-between items-center mb-4">
-                <select id="news-cat" class="bg-white/5 text-[10px] p-2 rounded-xl border border-white/10">
-                    <option value="ai">AI / IA</option><option value="nvidia">Nvidia/Google</option><option value="finance">Finanzas</option><option value="science">Ciencia</option>
+                <select id="news-cat" onchange="fetchDiscovery()" class="bg-white/5 text-[10px] p-2 rounded-xl outline-none">
+                    <option value="ai">AI / IA</option><option value="nvidia">Nvidia/Google</option><option value="finanzas">Finanzas</option><option value="science">Ciencia</option>
                 </select>
                 <button onclick="fetchDiscovery()" class="bg-blue-600/20 text-blue-400 px-4 py-1 rounded-full text-[9px] font-bold uppercase">Refrescar</button>
             </div>
@@ -68,7 +72,7 @@
         <section id="v-links" class="hidden">
             <div class="glass p-3 rounded-2xl mb-6 flex gap-2 border border-white/10">
                 <input type="text" id="manual-url" placeholder="Añadir URL..." class="flex-1 bg-white/5 p-2 rounded-xl text-xs outline-none">
-                <button onclick="addManualLink()" class="bg-blue-600 px-4 rounded-xl text-[10px] font-bold">AÑADIR</button>
+                <button onclick="addManualLink()" class="bg-blue-600 px-4 py-2 rounded-xl text-[10px] font-bold">AÑADIR</button>
             </div>
             <div id="links-list" class="space-y-2"></div>
         </section>
@@ -76,35 +80,42 @@
         <section id="v-notes" class="hidden">
             <div id="folder-tabs" class="folder-tabs mb-4"></div>
             <div class="glass p-4 rounded-3xl mb-6">
-                <textarea id="note-input" class="w-full bg-transparent text-xs h-20 outline-none" placeholder="Nota rápida..."></textarea>
+                <textarea id="note-input" class="w-full bg-transparent text-xs h-20 outline-none" placeholder="Nota mágica..."></textarea>
                 <div class="flex justify-between mt-3">
-                    <select id="folder-target" class="bg-black/60 text-[10px] p-2 rounded-xl border border-white/10"></select>
-                    <button onclick="saveNote()" class="bg-blue-600 px-8 py-2 rounded-xl text-xs font-bold uppercase">Guardar</button>
+                    <div class="flex gap-2">
+                        <input type="color" id="folder-color" class="w-6 h-6 rounded-full bg-transparent border-none">
+                        <select id="folder-target" class="bg-black/60 text-[10px] p-2 rounded-xl border border-white/10"></select>
+                    </div>
+                    <button onclick="saveNote()" class="bg-blue-600 px-6 py-2 rounded-xl text-xs font-bold uppercase">Guardar</button>
                 </div>
             </div>
             <div id="notes-grid" class="grid grid-cols-1 gap-2"></div>
         </section>
 
         <section id="v-data" class="hidden">
-            <div class="glass p-4 rounded-3xl border border-purple-500/20 mb-6 text-center">
-                <input type="text" id="ai-prompt" placeholder="Analiza mercado IA 2026..." class="w-full bg-white/5 p-3 rounded-2xl text-xs mb-3 outline-none">
-                <button onclick="runAnalysisIA()" class="w-full bg-purple-600 py-3 rounded-xl text-xs font-black uppercase">Análisis Maestro</button>
+            <div class="glass p-4 rounded-3xl border border-purple-500/20 mb-6">
+                <input type="text" id="ai-prompt" placeholder="Analiza mercado..." class="w-full bg-white/5 p-3 rounded-2xl text-xs mb-3 outline-none">
+                <button onclick="runAnalysisIA()" class="w-full bg-purple-600 py-3 rounded-xl text-xs font-black uppercase">Generar Informe</button>
             </div>
             <div class="chart-container glass p-4 rounded-3xl mb-4 relative">
                 <canvas id="chartDoughnut"></canvas>
                 <div id="chart-center-text" style="position:absolute; top:55%; left:50%; transform:translate(-50%, -50%); text-align:center; font-size:10px; font-weight:bold; color:#3b82f6; pointer-events:none;"></div>
             </div>
             <div id="ai-report" class="glass p-5 rounded-3xl text-[10px] hidden border-l-4 border-purple-500 bg-black/20"></div>
+            <div id="analysis-history" class="mt-8 space-y-2">
+                <h4 class="text-[9px] opacity-40 uppercase font-black">Historial Últimos 5</h4>
+                <div id="history-container"></div>
+            </div>
         </section>
 
         <section id="v-calendar" class="hidden">
             <div class="glass p-6 rounded-[2rem] border border-blue-500/20 text-center">
-                <h3 class="text-xs font-black mb-4 uppercase text-blue-400">Evento o Recordatorio</h3>
-                <input type="date" id="cal-date" class="w-full bg-white/5 p-3 rounded-xl mb-3 border border-white/10">
-                <input type="text" id="cal-text" placeholder="Título del evento..." class="w-full bg-white/5 p-3 rounded-xl mb-4 text-xs border border-white/10">
+                <h3 class="text-xs font-black mb-4 uppercase text-blue-400">Recordatorio NATIVO</h3>
+                <input type="date" id="cal-date" class="w-full bg-white/5 p-3 rounded-xl mb-3 border border-white/10 outline-none">
+                <input type="text" id="cal-text" placeholder="¿Qué agendamos?" class="w-full bg-white/5 p-3 rounded-xl mb-4 text-xs outline-none border border-white/10">
                 <button onclick="addReminder()" class="w-full bg-blue-600 py-4 rounded-2xl font-black uppercase text-[10px]">Agendar</button>
             </div>
-            <div id="notif-list" class="mt-6 space-y-3"></div>
+            <div id="notif-list" class="mt-8 space-y-3"></div>
         </section>
     </main>
 
@@ -126,30 +137,38 @@
         <div class="grid grid-cols-2 gap-3 mb-10">
             <button onclick="confirmSave('IA')" class="glass p-4 rounded-xl text-[10px] font-black uppercase">#Inteligencia</button>
             <button onclick="confirmSave('Resumen')" class="glass p-4 rounded-xl text-[10px] font-black uppercase">#Resumen</button>
-            <button onclick="confirmSave('Código')" class="glass p-4 rounded-xl text-[10px] font-black uppercase">#Código</button>
             <button onclick="confirmSave('Webs')" class="glass p-4 rounded-xl text-[10px] font-black uppercase">#Webs</button>
+            <button onclick="confirmSave('Código')" class="glass p-4 rounded-xl text-[10px] font-black uppercase">#Código</button>
         </div>
-        <button onclick="confirmSave('General')" class="w-full bg-blue-600 py-6 rounded-[2rem] font-black uppercase text-xl shadow-2xl">GUARDAR Y CERRAR</button>
+        <button onclick="confirmSave('General')" class="w-full bg-blue-600 py-5 rounded-[2rem] font-black uppercase">Guardar y Cerrar</button>
     </div>
 
     <div id="profile-modal" class="modal-full">
-        <div class="flex justify-between items-center mb-10"><h2 class="text-3xl font-black text-blue-500 uppercase italic">Settings Pro</h2><button onclick="closeProfile()" class="text-4xl">&times;</button></div>
+        <div class="flex justify-between items-center mb-8"><h2 class="text-2xl font-black text-blue-500 uppercase italic">Settings</h2><button onclick="closeProfile()" class="text-3xl">&times;</button></div>
         <div class="space-y-6">
-            <div class="glass p-6 rounded-3xl border-l-8 border-yellow-500">
-                <input type="password" id="api-key-input" placeholder="API Key Groq/Gemini..." class="w-full bg-black/60 p-4 rounded-xl text-xs border border-white/10 outline-none mb-6">
-                <div class="flex justify-between items-center mb-6"><span class="text-[10px] font-bold uppercase">Sonidos UX</span><input type="checkbox" id="sound-toggle" checked></div>
-                <div class="grid grid-cols-2 gap-3 mb-6">
-                    <button onclick="changeTheme('gold')" class="p-3 rounded-xl text-[9px] font-black uppercase" style="background:linear-gradient(135deg,#bf953f,#fcf6ba,#b38728); color:black;">Gold Edition</button>
-                    <button onclick="changeTheme('cyber')" class="p-3 rounded-xl text-[9px] font-black uppercase" style="background:linear-gradient(135deg,#2d00f7,#ff00bd); color:white;">Cyber Aura</button>
+            <div class="glass p-5 rounded-3xl border-l-4 border-yellow-500">
+                <input type="password" id="api-key-input" placeholder="API Key Groq/Gemini..." class="w-full bg-black/60 p-4 rounded-xl text-xs border border-white/10 mb-4 outline-none">
+                <div class="flex justify-between items-center mb-6"><span class="text-[10px] font-bold">SONIDOS UX</span><input type="checkbox" id="sound-toggle" checked></div>
+                
+                <p class="text-[9px] font-black opacity-30 uppercase mb-2">Diseñador de Botones</p>
+                <div class="grid grid-cols-2 gap-2 mb-4">
+                    <select id="btn-shape" class="bg-black/60 text-[10px] p-2 rounded-lg border border-white/10"><option value="rounded-full">Círculo</option><option value="rounded-xl">Cuadrado</option></select>
+                    <input type="color" id="btn-color" class="w-full h-8 rounded-lg bg-transparent">
                 </div>
-                <button onclick="saveSettings()" class="w-full bg-blue-600 py-4 rounded-2xl font-black uppercase text-xs">Sincronizar Cerebro</button>
+                <input type="range" id="btn-size" min="30" max="100" class="w-full mb-6">
+
+                <div class="grid grid-cols-2 gap-2 mb-6">
+                    <button onclick="changeTheme('gold')" class="p-3 rounded-xl text-[9px] font-black uppercase gold-grad text-black">Gold</button>
+                    <button onclick="changeTheme('cyber')" class="p-3 rounded-xl text-[9px] font-black uppercase cyber-grad text-white">Cyber</button>
+                </div>
+                <button onclick="saveSettings()" class="w-full bg-blue-600 py-3 rounded-xl font-bold uppercase text-[10px]">Sincronizar</button>
             </div>
-            <button onclick="window.open('https://www.paypal.me/texiduvi')" class="w-full bg-yellow-500 text-black py-6 rounded-[2.5rem] font-black uppercase flex items-center justify-center gap-4 text-lg"><i class="fa-brands fa-paypal"></i> Invitar Café ☕</button>
-            <div class="text-center py-10 opacity-60 border-t border-white/5">
-                <p class="text-[10px] font-black uppercase">VICO POCKET ELITE © 2026</p>
-                <p class="text-[11px] font-bold text-blue-400">Jaime Andrés Dueñas Vicuña</p>
+            <button onclick="window.open('https://www.paypal.me/texiduvi')" class="w-full bg-yellow-500 text-black py-5 rounded-[2rem] font-black uppercase flex items-center justify-center gap-3"><i class="fa-brands fa-paypal"></i> Invitar un Café ☕</button>
+            <div class="text-center py-10 opacity-30 border-t border-white/5">
+                <p class="text-[9px] uppercase font-bold">VICO POCKET ELITE © 2026</p>
+                <p class="text-[11px] font-black text-blue-400">Jaime Andrés Dueñas Vicuña</p>
                 <a href="https://linkedin.com/in/andyjavico" target="_blank" class="text-3xl mt-4 block text-blue-400"><i class="fa-brands fa-linkedin"></i></a>
-                <p class="text-[8px] mt-4 opacity-50 uppercase font-black">Potenciado con Gemini 3 Pro</p>
+                <p class="text-[8px] mt-4 uppercase font-black tracking-widest">Potenciado con Gemini 3 Pro</p>
             </div>
         </div>
     </div>
@@ -162,7 +181,6 @@
     </nav>
 
     <script>
-        // LÓGICA DE CARPETAS MAESTRAS
         let defaultFolders = ['Fijadas', 'Resumen', 'Hoy', 'Recordatorio', 'Subscripción', 'APIs', 'Proyectos', 'Código', 'Links', 'Recetas', 'Varios', 'Webs'];
         let notes = JSON.parse(localStorage.getItem('vico_notes')) || [];
         let folders = JSON.parse(localStorage.getItem('vico_folders')) || defaultFolders;
@@ -180,24 +198,23 @@
             if(localStorage.getItem('vico_api_key')) document.getElementById('api-key-input').value = localStorage.getItem('vico_api_key');
         };
 
-        // DISCOVERY PRO + TTS + SHARE
+        // DISCOVERY BILINGÜE + TTS
         async function fetchDiscovery() {
-            const cat = document.getElementById('news-cat').value;
             const container = document.getElementById('discovery-list');
             container.innerHTML = "<p class='animate-pulse text-center py-10 uppercase text-[9px]'>Sincronizando fuentes globales...</p>";
-            const feeds = { ai: 'https://www.wired.com/feed/tag/ai/latest/rss', nvidia: 'https://www.xataka.com/feed/full', finance: 'https://www.eleconomista.es/rss/rss-economia.php' };
+            const feeds = ['https://www.wired.com/feed/rss', 'https://www.xataka.com/feed/full', 'https://techcrunch.com/feed/'];
             try {
-                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feeds[cat] || feeds.ai)}`);
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(feeds[Math.floor(Math.random()*feeds.length)])}`);
                 const d = await res.json();
                 container.innerHTML = d.items.slice(0, 10).map(item => `
                     <div class="link-card glass p-3 relative">
                         <img src="${item.thumbnail || 'icon.png'}" onerror="this.src='icon.png'">
                         <div class="flex-1 overflow-hidden">
                             <h4 class="text-[10px] font-black uppercase text-blue-300 leading-tight truncate">${item.title}</h4>
-                            <div class="flex gap-3 mt-2">
-                                <button onclick="window.open('${item.link}')" class="text-[8px] font-bold text-blue-400">LEER</button>
+                            <div class="flex gap-4 mt-2">
+                                <button onclick="window.open('${item.link}')" class="text-[8px] font-bold text-blue-400 uppercase">Leer</button>
                                 <button onclick="speak('${item.title.replace(/'/g,"")}')" class="text-[8px] font-bold text-gray-400"><i class="fa-solid fa-volume-high"></i></button>
-                                <button onclick="saveLinkToVico('${item.title.replace(/'/g,"")}', '${item.link}')" class="text-[8px] font-bold text-purple-400"><i class="fa-solid fa-bookmark"></i></button>
+                                <button onclick="saveLinkToVico('${item.title.replace(/'/g,"")}', '${item.link}')" class="text-[8px] font-bold text-purple-400 uppercase">Guardar</button>
                             </div>
                         </div>
                     </div>`).join('');
@@ -206,7 +223,7 @@
 
         function speak(t) { const u = new SpeechSynthesisUtterance(t); u.lang = 'es-ES'; window.speechSynthesis.speak(u); }
 
-        // NOTAS EXPANDIBLES + CARPETAS
+        // NOTAS EXPANDIBLES
         function renderFolders() {
             document.getElementById('folder-tabs').innerHTML = folders.map(f => `<div onclick="currentFolder='${f}';renderFolders();renderNotes()" class="folder-tab ${currentFolder===f?'active':''}">${f}</div>`).join('');
             document.getElementById('folder-target').innerHTML = folders.map(f => `<option value="${f}">${f}</option>`).join('');
@@ -224,12 +241,12 @@
         }
         function deleteNote(id) { notes = notes.filter(n => n.id !== id); localStorage.setItem('vico_notes', JSON.stringify(notes)); renderNotes(); renderDashboard(); }
 
-        // ANÁLISIS ESTRATÉGICO IA
+        // ANALISIS ESTRATEGICO IA
         async function runAnalysisIA() {
             const p = document.getElementById('ai-prompt').value, key = localStorage.getItem('vico_api_key');
             if(!p || !key) return;
             const rep = document.getElementById('ai-report'); rep.classList.remove('hidden'); rep.innerHTML = "Analizando Inteligencia...";
-            const cmd = `Analiza: "${p}". Responde solo JSON: {"labels":["Asia","Europa","USA"],"data":[40,30,30],"excel":{"zona":"Global","roi":"25%","riesgo":"Bajo"},"analisis":"Resumen detallado..."}`;
+            const cmd = `Analiza: "${p}". Responde solo JSON: {"labels":["A","B","C"],"data":[40,30,30],"excel":{"zona":"Global","roi":"25%","riesgo":"Bajo"},"analisis":"Informe estratégico detallado..."}`;
             try {
                 const res = await fetch("https://api.groq.com/openai/v1/chat/completions", { method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`}, body:JSON.stringify({model:"llama-3.3-70b-versatile", messages:[{role:"user",content:cmd}]}) });
                 const d = await res.json();
@@ -237,52 +254,29 @@
                 updateCharts(dataIA);
                 rep.innerHTML = dataIA.analisis;
                 document.getElementById('chart-center-text').innerHTML = `ROI ${dataIA.excel.roi}<br>${dataIA.excel.zona}`;
-            } catch(e) { rep.innerHTML = "Error JSON."; }
+            } catch(e) { rep.innerHTML = "Error IA."; }
         }
         function updateCharts(d) {
             if(charts.doughnut) charts.doughnut.destroy();
             charts.doughnut = new Chart(document.getElementById('chartDoughnut'), { type:'doughnut', data:{labels:d.labels, datasets:[{data:d.data, backgroundColor:['#3b82f6','#8b5cf6','#ec4899']}]}, options:{cutout:'75%', plugins:{legend:{display:false}}} });
         }
 
-        // CALENDARIO NATIVO
-        function addReminder() {
-            const d = document.getElementById('cal-date').value, t = document.getElementById('cal-text').value;
-            if(d && t) { reminders.unshift({ date: d, text: t, id: Date.now() }); localStorage.setItem('vico_reminders', JSON.stringify(reminders)); renderReminders(); alert("Evento guardado!"); }
-        }
-        function renderReminders() { document.getElementById('notif-list').innerHTML = reminders.map(r => `<div class="glass p-4 rounded-xl border-l-4 border-green-500 text-[10px] flex justify-between items-center"><div><b class="text-blue-400">${r.date}</b><br>${r.text}</div><button onclick="reminders=reminders.filter(x=>x.id!==r.id);renderReminders();localStorage.setItem('vico_reminders',JSON.stringify(reminders))" class="text-red-500"><i class="fa-solid fa-trash"></i></button></div>`).join(''); }
-
-        // LINKS & SHARE
-        function saveLinkToVico(l, u, tag='General') {
-            const cleanUrl = u.includes('http') ? u : 'https://' + u;
-            links.unshift({ label: l, url: cleanUrl, favicon: `https://www.google.com/s2/favicons?sz=128&domain=${new URL(cleanUrl).hostname}`, tag: tag });
-            localStorage.setItem('vico_custom_btns', JSON.stringify(links)); renderLinks(); renderDashboard();
-        }
-        function confirmSave(tag) {
-            const url = new URLSearchParams(window.location.search).get('url');
-            saveLinkToVico("Guardado desde Android", url, tag);
-            document.getElementById('save-confirm').style.display='block';
-            setTimeout(() => { window.close(); }, 2000);
-        }
-        function addManualLink() { const v = document.getElementById('manual-url').value; if(v) { saveLinkToVico("Link Manual", v); document.getElementById('manual-url').value=''; } }
-        function renderLinks() {
-            document.getElementById('links-list').innerHTML = links.map((btn, i) => `
-                <div class="link-card glass">
-                    <img src="${btn.favicon}" onerror="this.src='icon.png'">
-                    <div class="flex-1 overflow-hidden"><h4 class="text-[10px] font-black uppercase truncate text-blue-400">${btn.label}</h4>
-                    <div class="flex gap-4 mt-1"><button onclick="window.open('${btn.url}', '_self')" class="text-[8px] font-bold text-white uppercase">Abrir</button>
-                    <button onclick="links.splice(${i},1);localStorage.setItem('vico_custom_btns',JSON.stringify(links));renderLinks()" class="text-[8px] font-bold text-red-500 uppercase">Borrar</button></div></div>
-                </div>`).join('');
-        }
-
-        // UTILIDADES
+        // OTROS
         function switchTab(t) { document.querySelectorAll('main section').forEach(s => s.classList.add('hidden')); document.getElementById(`v-${t}`).classList.remove('hidden'); if(t === 'notes') renderFolders(); }
-        function toggleElement(id) { const el = document.getElementById(id); el.style.display = (el.style.display === 'flex') ? 'none' : 'flex'; }
         function openProfile() { document.getElementById('profile-modal').style.display='block'; }
         function closeProfile() { document.getElementById('profile-modal').style.display='none'; }
-        function toggleDark() { document.body.classList.toggle('light-mode'); }
-        function changeTheme(t) { document.body.className = `p-4 ${t}-grad`; }
         function saveSettings() { localStorage.setItem('vico_api_key', document.getElementById('api-key-input').value); alert("Sincronizado."); location.reload(); }
         function renderDashboard() { document.getElementById('dash-notes-count').innerText = notes.length; document.getElementById('dash-links-count').innerText = links.length; }
+        function addManualLink() { const v = document.getElementById('manual-url').value; if(v) { saveLinkToVico("Manual Link", v); document.getElementById('manual-url').value=''; } }
+        function saveLinkToVico(l, u, tag='General') { const cleanUrl = u.includes('http') ? u : 'https://' + u; links.unshift({ label: l, url: cleanUrl, favicon: `https://www.google.com/s2/favicons?sz=128&domain=${new URL(cleanUrl).hostname}`, tag: tag }); localStorage.setItem('vico_custom_btns', JSON.stringify(links)); renderLinks(); renderDashboard(); }
+        function renderLinks() { document.getElementById('links-list').innerHTML = links.map((btn, i) => `<div class="link-card glass"><img src="${btn.favicon}" onerror="this.src='icon.png'"><div class="flex-1 overflow-hidden"><h4 class="text-[10px] font-black uppercase truncate text-blue-400">${btn.label}</h4><div class="flex gap-4 mt-1"><button onclick="window.open('${btn.url}', '_self')" class="text-[8px] font-bold text-white">Abrir</button><button onclick="links.splice(${i},1);localStorage.setItem('vico_custom_btns',JSON.stringify(links));renderLinks()" class="text-[8px] font-bold text-red-500">Borrar</button></div></div></div>`).join(''); }
+        function toggleElement(id) { const el = document.getElementById(id); el.style.display = (el.style.display === 'flex') ? 'none' : 'flex'; }
+        function toggleDark() { document.body.classList.toggle('light-mode'); }
+        function setChatMode(m) { chatMode = m; document.getElementById('mode-libre').classList.toggle('opacity-50', m==='pro'); document.getElementById('mode-pro').classList.toggle('opacity-50', m==='libre'); }
+        function addReminder() { const d = document.getElementById('cal-date').value, t = document.getElementById('cal-text').value; if(d && t) { reminders.unshift({ date: d, text: t, id: Date.now() }); localStorage.setItem('vico_reminders', JSON.stringify(reminders)); renderReminders(); alert("Evento guardado!"); } }
+        function renderReminders() { document.getElementById('notif-list').innerHTML = reminders.map(r => `<div class="glass p-4 rounded-xl border-l-4 border-green-500 text-[10px] flex justify-between items-center"><div><b>${r.date}</b><br>${r.text}</div><button onclick="reminders=reminders.filter(x=>x.id!==r.id);localStorage.setItem('vico_reminders',JSON.stringify(reminders));renderReminders()" class="text-red-500"><i class="fa-solid fa-trash"></i></button></div>`).join(''); }
+        async function sendChatIA() { /* Lógica de Groq anterior */ }
+        function changeTheme(t) { document.body.className = `p-4 ${t}-grad`; }
     </script>
 </body>
-</html> 
+                        </html> 
