@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VICO POCKET ELITE v9.9.8</title>
+    <title>VICO POCKET ELITE v10</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" href="icon.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -11,125 +11,129 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root { --vbg: #0b0f1a; --vacc: #3b82f6; --vtxt: #e2e8f0; }
-        body { background: var(--vbg); color: var(--vtxt); font-family: 'Inter', sans-serif; transition: 0.3s; overflow-x: hidden; }
+        body { background: var(--vbg); color: var(--vtxt); font-family: 'Inter', sans-serif; transition: 0.3s; overflow-x: hidden; margin: 0; }
         body.light-mode { --vbg: #f8fafc; --vtxt: #0f172a; --vacc: #2563eb; }
-        main { padding-bottom: 160px; position: relative; z-index: 1; }
+        
+        main { padding-bottom: 180px; position: relative; z-index: 1; }
         header { display: flex; justify-content: space-between; align-items: center; padding: 1rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .vico-brand { font-weight: 900; font-style: italic; color: var(--vacc); font-size: 1.4rem; }
-        .chat-box { width: 92%; max-width: 350px; height: 500px; position: fixed; bottom: 120px; right: 4%; display: none; flex-direction: column; z-index: 99999 !important; background: rgba(11, 15, 26, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--vacc); border-radius: 24px; overflow: hidden; }
-        .modal-full { position: fixed; inset: 0; background: #0b0f1a; z-index: 999999 !important; padding: 2rem; overflow-y: auto; display: none; }
-        .folder-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; }
-        .folder-chip { background: rgba(255,255,255,0.05); padding: 6px 15px; border-radius: 20px; font-size: 10px; font-weight: 800; white-space: nowrap; cursor: pointer; }
-        .folder-chip.active { background: var(--vacc); border: 1px solid white; }
+        .vico-brand { font-weight: 900; font-style: italic; color: var(--vacc); font-size: 1.4rem; cursor: pointer; }
+        .vico-brand:hover { text-shadow: 0 0 15px var(--vacc); }
+
+        /* Chat Responsive Izquierda */
+        .chat-box { width: 92%; max-width: 350px; height: 500px; position: fixed; bottom: 110px; left: 4%; display: none; flex-direction: column; z-index: 99999 !important; background: rgba(11, 15, 26, 0.98); backdrop-filter: blur(20px); border: 1px solid var(--vacc); border-radius: 24px; overflow: hidden; }
+        
+        /* Carpetas de Notas en Pestañas */
+        .folder-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 10px; scrollbar-width: none; }
+        .folder-chip { background: rgba(255,255,255,0.05); padding: 6px 15px; border-radius: 20px; font-size: 10px; font-weight: 800; white-space: nowrap; cursor: pointer; border: 1px solid transparent; }
+        .folder-chip.active { background: var(--vacc); border-color: white; }
+
+        .modal-full { position: fixed; inset: 0; background: var(--vbg); z-index: 999999 !important; padding: 2rem; overflow-y: auto; display: none; }
+        
+        /* Botón Enviar Chat Latido Verde */
+        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); } 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); } }
+        .btn-pulse { animation: pulse-green 1.5s infinite; background: #16a34a !important; }
+
+        .keep-card img { width: 45px; height: 45px; border-radius: 10px; object-fit: cover; background: #161b22; }
     </style>
 </head>
 <body class="p-4">
 
     <header class="fixed top-0 left-0 w-full glass z-[5000]">
         <div class="vico-brand text-left">VICO POCKET <span class="text-[9px] border border-blue-500 px-1 italic">ELITE</span></div>
-        <div class="flex gap-4 items-center">
+        <div class="flex gap-3">
             <select id="lang-sel" onchange="translateApp()" class="bg-transparent text-[10px] font-bold outline-none border-none uppercase">
-                <option value="es">ES</option><option value="en">EN</option><option value="zh">ZH</option><option value="fil">FIL</option>
+                <option value="es">ES</option><option value="en">EN</option><option value="zh">ZH</option><option value="fil">FIL</option><option value="hi">HI</option><option value="ms">MS</option>
             </select>
-            <button onclick="toggleElement('ai-chat-container')" class="text-blue-400 text-lg"><i class="fa-solid fa-comment-dots"></i></button>
-            <button onclick="toggleDark()" class="text-lg"><i class="fa-solid fa-moon"></i></button>
+            <button onclick="toggleDark()" id="dark-btn" class="text-lg"><i class="fa-solid fa-moon"></i></button>
+            <button onclick="toggleElement('ai-chat-container')" class="text-blue-400 text-lg"><i class="fa-solid fa-robot"></i></button>
         </div>
     </header>
 
     <main class="mt-20">
         <nav class="flex gap-4 border-b border-white/10 pb-2 overflow-x-auto text-[10px] font-black uppercase mb-6">
-            <button onclick="switchTab('home')" id="btn-home" class="text-blue-400" data-i18n="home">Home🏡</button>
-            <button onclick="switchTab('links')" id="btn-links" class="opacity-40" data-i18n="links">Links🔗</button>
-            <button onclick="switchTab('notes')" id="btn-notes" class="opacity-40" data-i18n="notes">Notas📝</button>
-            <button onclick="switchTab('data')" id="btn-data" class="opacity-40" data-i18n="analysis">Análisis🪄</button>
+            <button onclick="switchTab('home')" id="btn-home" class="text-blue-400">Home🏡</button>
+            <button onclick="switchTab('links')" id="btn-links" class="opacity-40">Links🔗</button>
+            <button onclick="switchTab('notes')" id="btn-notes" class="opacity-40">Notas📝</button>
+            <button onclick="switchTab('data')" id="btn-data" class="opacity-40">Análisis🪄</button>
             <button onclick="switchTab('rss')" id="btn-rss" class="opacity-40">RSS📰</button>
             <button onclick="switchTab('calendar')" id="btn-calendar" class="opacity-40">📅</button>
         </nav>
 
         <section id="v-home">
-            <div id="top-phrase" class="glass p-5 rounded-[2rem] mb-6 text-[11px] italic text-blue-300 text-center border-l-4 border-blue-500"></div>
+            <div id="top-phrase" class="glass p-5 rounded-[2rem] mb-6 text-[11px] italic text-blue-300 text-center border-l-4 border-blue-500 shadow-xl"></div>
             <div id="discovery-list" class="space-y-4"></div>
-            <div id="rss-discovery" class="mt-6 border-t border-white/10 pt-4 space-y-4"></div>
-        </section>
-
-        <section id="v-notes" class="hidden">
-            <div id="folder-tabs" class="folder-scroll mb-4"></div>
-            <div class="glass p-4 rounded-3xl mb-4">
-                <input type="text" id="new-folder-name" placeholder="Nueva carpeta..." class="bg-white/5 p-2 rounded-xl text-xs mb-2 w-full outline-none">
-                <button onclick="createNewFolder()" class="bg-blue-600/20 text-blue-400 w-full py-1 rounded-xl text-[9px] font-bold mb-4 uppercase">Crear Carpeta</button>
-                <textarea id="note-input" class="w-full bg-transparent text-xs h-20 outline-none" placeholder="Escribe aquí..."></textarea>
-                <div class="flex justify-between items-center mt-2">
-                    <select id="folder-target" class="bg-black/60 text-[9px] p-2 rounded-lg border-white/10"></select>
-                    <button onclick="saveNote()" class="bg-blue-600 px-6 py-2 rounded-xl text-[10px] font-bold uppercase">Guardar</button>
-                </div>
-            </div>
-            <div id="notes-grid" class="space-y-2"></div>
+            <div id="rss-discovery" class="mt-8 space-y-4 border-t border-white/5 pt-4"></div>
         </section>
 
         <section id="v-data" class="hidden">
             <div class="glass p-5 rounded-3xl border border-purple-500/20 mb-6 text-center">
-                <h3 class="text-xs font-black mb-4 uppercase text-purple-400" data-i18n="analysis_title">Análisis Estratégico</h3>
-                <input type="text" id="ai-prompt" placeholder="Ej: Tendencias IA 2026..." class="w-full bg-white/5 p-3 rounded-2xl text-xs mb-4 outline-none">
-                <button onclick="runAnalysisIA()" class="w-full bg-purple-600 py-3 rounded-xl text-xs font-black uppercase">Generar Informe Maestro</button>
+                <h3 class="text-xs font-black mb-4 uppercase text-purple-400">Análisis Estratégico</h3>
+                <input type="text" id="ai-prompt" placeholder="Ej: Mercado de oro 2026..." class="w-full bg-white/5 p-3 rounded-2xl text-xs mb-4 outline-none">
+                <button onclick="runAnalysisIA()" class="w-full bg-purple-600 py-3 rounded-xl text-xs font-black uppercase shadow-lg">Generar Informe</button>
             </div>
-            <div class="chart-container glass p-4 rounded-3xl mb-4 relative">
-                <canvas id="chartDoughnut"></canvas>
-                <div id="chart-center-text" style="position:absolute; top:55%; left:50%; transform:translate(-50%, -50%); text-align:center; font-size:10px; font-weight:bold; color:#3b82f6; pointer-events:none;"></div>
+            <div id="ai-visuals" class="hidden space-y-4">
+                <div class="glass p-4 rounded-3xl relative"><canvas id="chartDoughnut"></canvas></div>
+                <div id="ai-report" class="glass p-5 rounded-3xl text-[10px] leading-relaxed border-l-4 border-purple-500 bg-black/20"></div>
+                <div class="flex gap-2">
+                    <button onclick="extendReport()" class="flex-1 bg-blue-600 py-3 rounded-xl text-[9px] font-bold uppercase">Extender</button>
+                    <button onclick="predictFuture()" class="flex-1 bg-green-600 py-3 rounded-xl text-[9px] font-bold uppercase">Predecir Fluctuaciones</button>
+                </div>
             </div>
-            <div id="ai-report" class="glass p-5 rounded-3xl text-[10px] hidden border-l-4 border-purple-500 bg-black/20"></div>
+        </section>
+
+        <section id="v-calendar" class="hidden">
+            <div class="glass p-6 rounded-3xl mb-6 shadow-xl border border-blue-500/10">
+                <h3 class="text-xs font-black mb-4 uppercase text-blue-400">Evento o Recordatorio</h3>
+                <div class="flex gap-2 mb-2">
+                    <input type="date" id="cal-date" class="flex-1 bg-white/5 p-3 rounded-xl outline-none">
+                    <input type="time" id="cal-time" class="bg-white/5 p-3 rounded-xl outline-none">
+                </div>
+                <input type="text" id="cal-text" placeholder="Título del evento..." class="w-full bg-white/5 p-3 rounded-xl mb-4 text-xs">
+                <button onclick="addReminder()" class="w-full bg-blue-600 py-4 rounded-2xl font-black uppercase text-[10px]">Agendar Notificación</button>
+            </div>
+            <div id="reminder-list" class="space-y-3"></div>
         </section>
 
         <section id="v-rss" class="hidden">
             <div class="glass p-5 rounded-3xl mb-6">
-                <input type="text" id="rss-name" placeholder="Nombre Canal" class="w-full bg-white/5 p-3 rounded-xl text-xs mb-2 outline-none">
+                <h3 class="text-[10px] font-black mb-3 uppercase opacity-50">Nuevo Canal RSS</h3>
+                <input type="text" id="rss-name" placeholder="Nombre" class="w-full bg-white/5 p-3 rounded-xl text-xs mb-2 outline-none">
                 <input type="text" id="rss-url" placeholder="https://..." class="w-full bg-white/5 p-3 rounded-xl text-xs mb-3 outline-none">
                 <button onclick="addRSS()" class="w-full bg-blue-600 py-3 rounded-xl text-[10px] font-black uppercase">Añadir Feed</button>
             </div>
             <div id="rss-list" class="space-y-3"></div>
         </section>
-
-        <section id="v-calendar" class="hidden">
-            <div class="glass p-6 rounded-3xl mb-6">
-                <h3 class="text-xs font-black mb-4 uppercase text-blue-400">Agendar Recordatorio</h3>
-                <input type="date" id="cal-date" class="w-full bg-white/5 p-3 rounded-xl mb-2">
-                <input type="text" id="cal-text" placeholder="¿Qué recordar?" class="w-full bg-white/5 p-3 rounded-xl mb-3">
-                <button onclick="addReminder()" class="w-full bg-blue-600 py-3 rounded-xl font-bold uppercase text-[10px]">Guardar en Calendario</button>
-            </div>
-            <div id="reminder-list" class="space-y-2"></div>
-        </section>
-
-        <section id="v-links" class="hidden"><div id="links-list" class="space-y-3"></div></section>
     </main>
 
     <div id="ai-chat-container" class="chat-box glass shadow-2xl">
         <div class="bg-blue-600 p-2 flex justify-between px-4"><span class="text-[9px] font-black uppercase">VICO Assistant</span><button onclick="toggleElement('ai-chat-container')">&times;</button></div>
         <div id="chat-content" class="flex-1 p-4 overflow-y-auto text-[11px] space-y-3"></div>
-        <div class="p-3 border-t border-white/10 flex gap-2"><input type="text" id="chat-msg" class="flex-1 bg-black/40 p-3 rounded-xl text-[11px] outline-none" placeholder="Escribe..."><button onclick="sendChatIA()" class="bg-blue-600 px-4 rounded-xl"><i class="fa-solid fa-paper-plane"></i></button></div>
+        <div class="p-3 border-t border-white/10 flex gap-2">
+            <input type="text" id="chat-msg" class="flex-1 bg-black/40 p-3 rounded-xl text-[11px] outline-none" placeholder="Escribe..." onkeyup="if(event.key==='Enter') sendChatIA()">
+            <button id="chat-send-btn" onclick="sendChatIA()" class="bg-blue-600 px-4 rounded-xl"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
     </div>
 
     <div id="profile-modal" class="modal-full">
-        <div class="flex justify-between items-center mb-8"><h2 class="text-2xl font-black text-blue-500 uppercase italic">CONFIGURACIÓN</h2><button onclick="closeProfile()" class="text-3xl">&times;</button></div>
-        <div class="space-y-6">
+        <div class="flex justify-between items-center mb-10"><h2 class="text-2xl font-black text-blue-500 uppercase">CONFIGURACIÓN</h2><button onclick="closeProfile()" class="text-4xl">&times;</button></div>
+        <div class="space-y-8">
             <div class="glass p-5 rounded-3xl border-l-4 border-yellow-500">
                 <p class="text-[9px] font-black uppercase opacity-40 mb-2">Cerebro AI (API Key)</p>
-                <input type="password" id="api-key-input" class="w-full bg-black/50 p-4 rounded-2xl text-xs border border-white/10 mb-4" placeholder="Ingresar Key...">
+                <input type="password" id="api-key-input" class="w-full bg-black/50 p-4 rounded-2xl text-xs border border-white/10 mb-4" placeholder="Pegar clave aquí...">
                 <button onclick="saveApiKey()" class="w-full bg-blue-600 py-2 rounded-xl text-[10px] font-bold uppercase">Guardar API</button>
             </div>
             <div class="glass p-5 rounded-3xl">
-                <p class="text-[9px] font-black uppercase opacity-40 mb-2">Nueva Frase Motivadora</p>
-                <input type="text" id="new-phrase" class="w-full bg-white/5 p-2 rounded-lg text-xs mb-2 outline-none">
-                <button onclick="savePhrase()" class="w-full bg-green-600 py-2 rounded-xl text-[10px] font-bold uppercase">Añadir Frase</button>
-            </div>
-            <div class="glass p-5 rounded-3xl">
                 <p class="text-[9px] font-black uppercase opacity-40 mb-2">Creador de Accesos URL</p>
-                <input type="text" id="btn-label" placeholder="Nombre" class="w-full bg-white/5 p-2 rounded-lg text-xs mb-2 outline-none">
-                <input type="text" id="btn-link" placeholder="https://..." class="w-full bg-white/5 p-2 rounded-lg text-xs mb-3 outline-none">
-                <button onclick="createCustomBtn()" class="w-full bg-purple-600 py-2 rounded-xl text-[10px] font-bold uppercase">Crear Botón</button>
+                <input type="text" id="btn-label" placeholder="Nombre" class="w-full bg-white/5 p-2 rounded-lg text-xs mb-2">
+                <input type="text" id="btn-link" placeholder="URL..." class="w-full bg-white/5 p-2 rounded-lg text-xs mb-3">
+                <button onclick="createCustomBtn()" class="w-full bg-purple-600 py-2 rounded-xl text-[10px] font-bold uppercase">Crear Botón Personalizado</button>
             </div>
-            <button onclick="window.open('https://paypal.me/texiduvi')" class="w-full bg-yellow-500 text-black py-5 rounded-[2rem] font-black uppercase flex items-center justify-center gap-3 shadow-xl"><i class="fa-brands fa-paypal"></i> Invitar Café ☕</button>
-            <div class="text-center py-10 border-t border-white/5">
+            <button onclick="window.open('https://paypal.me/texiduvi')" class="w-full bg-yellow-500 text-black py-6 rounded-[2rem] font-black uppercase flex items-center justify-center gap-3 shadow-xl"><i class="fa-brands fa-paypal"></i> Invitar Café ☕</button>
+            <div class="text-center py-10 opacity-40 border-t border-white/5">
                 <p class="text-[10px] font-black uppercase tracking-tighter">AndyJavico © 2026</p>
-                <a href="https://linkedin.com/in/andyjavico" target="_blank" class="text-2xl mt-4 block text-blue-400"><i class="fa-brands fa-linkedin"></i></a>
+                <p class="text-[11px] font-bold text-blue-400 mt-2">Jaime Andrés Dueñas Vicuña</p>
+                <a href="https://linkedin.com/in/andyjavico" target="_blank" class="text-3xl mt-4 block text-blue-400"><i class="fa-brands fa-linkedin"></i></a>
+                <p class="text-[8px] mt-6 uppercase font-black tracking-widest">Potenciado con Gemini 3 Pro</p>
             </div>
         </div>
     </div>
@@ -143,86 +147,82 @@
 
     <script>
         const MASTER_FOLDERS = ['Proyectos', 'Links', 'Notas', 'APIs', 'Contraseñas', 'Varios', 'Code', 'Recetas', 'Prompts', 'Direcciones', 'Clientes', 'Productos', 'Negocios', 'Servicios', 'Websyhosting'];
-        const i18n = { 
-            es: { home: "Home🏡", links: "Links🔗", notes: "Notas📝", analysis: "Análisis🪄", analysis_title: "Análisis Estratégico" },
-            en: { home: "Home🏡", links: "Links🔗", notes: "Notes📝", analysis: "Analysis🪄", analysis_title: "Strategic Analysis" }
-        };
-
         let notes = JSON.parse(localStorage.getItem('vico_notes')) || [];
         let folders = JSON.parse(localStorage.getItem('vico_folders')) || MASTER_FOLDERS;
         let rss = JSON.parse(localStorage.getItem('vico_rss')) || [];
+        let links = JSON.parse(localStorage.getItem('vico_links')) || [];
+        let reminders = JSON.parse(localStorage.getItem('vico_reminders')) || [];
         let currentFolder = 'Proyectos';
-        let currentLang = 'es';
 
         window.onload = () => {
-            renderFolders(); renderNotes(); renderRSS(); fetchDiscovery(); renderDashboard();
+            renderFolders(); renderNotes(); renderRSS(); fetchDiscovery(); renderReminders();
+            if(localStorage.getItem('vico_api_key')) {
+                document.getElementById('chat-content').innerHTML = `<p class="bg-blue-600/10 p-3 rounded-xl italic">¡Bienvenido! VICO está conectado.</p>`;
+            }
         };
-
-        function translateApp() {
-            currentLang = document.getElementById('lang-sel').value;
-            document.querySelectorAll('[data-i18n]').forEach(el => {
-                const key = el.getAttribute('data-i18n');
-                if(i18n[currentLang][key]) el.innerText = i18n[currentLang][key];
-            });
-        }
-
-        async function fetchDiscovery() {
-            const container = document.getElementById('discovery-list');
-            container.innerHTML = "<p class='animate-pulse text-center p-10 uppercase text-[9px] font-black'>VICO Sincronizando...</p>";
-            try {
-                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=https://www.wired.com/feed/rss`);
-                const d = await res.json();
-                container.innerHTML = d.items.slice(0, 5).map(item => `<div class="glass p-4 rounded-2xl border border-white/5"><h4 class="text-[10px] font-black uppercase text-blue-300">${item.title}</h4><button onclick="window.open('${item.link}')" class="mt-2 text-[8px] font-bold text-blue-400">LEER MÁS</button></div>`).join('');
-            } catch(e) { container.innerHTML = "Error Discovery."; }
-        }
 
         function addRSS() {
             const n = document.getElementById('rss-name').value, u = document.getElementById('rss-url').value;
-            if(n && u) { rss.push({name:n, url:u}); localStorage.setItem('vico_rss', JSON.stringify(rss)); renderRSS(); }
-        }
-        function renderRSS() {
-            document.getElementById('rss-list').innerHTML = rss.map((r, i) => `<div class="glass p-4 rounded-2xl flex justify-between items-center"><span>${r.name}</span><button onclick="sendToDiscovery('${r.url}')" class="bg-blue-600 px-3 py-1 rounded-xl text-[8px]">ENVIAR</button></div>`).join('');
-        }
-        async function sendToDiscovery(url) {
-            const disc = document.getElementById('rss-discovery');
-            const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${url}`);
-            const d = await res.json();
-            disc.innerHTML = d.items.slice(0, 5).map(item => `<div class="glass p-4 rounded-2xl bg-blue-600/5"><span class="text-[7px] uppercase font-black text-blue-400">RSS Feed</span><h4 class="text-[9px] font-bold uppercase">${item.title}</h4></div>`).join('');
-            switchTab('home');
+            if(n && u) { rss.unshift({name:n, url:u}); localStorage.setItem('vico_rss', JSON.stringify(rss)); renderRSS(); }
         }
 
+        function renderRSS() {
+            document.getElementById('rss-list').innerHTML = rss.map((r, i) => `
+                <div class="glass p-4 rounded-2xl flex justify-between items-center">
+                    <div><b class="text-blue-400 text-xs">${r.name}</b><br><span class="text-[8px] opacity-40">${r.url}</span></div>
+                    <button onclick="sendToDiscovery('${r.url}')" class="bg-blue-600 px-3 py-1 rounded-xl text-[8px] uppercase">Enviar</button>
+                </div>`).join('');
+        }
+
+        async function sendToDiscovery(url) {
+            const container = document.getElementById('rss-discovery');
+            container.innerHTML = "<p class='text-center text-[9px] animate-pulse'>Inyectando noticias del Feed...</p>";
+            try {
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${url}`);
+                const d = await res.json();
+                container.innerHTML = d.items.slice(0, 5).map(item => `
+                    <div class="glass p-4 rounded-2xl bg-blue-600/5">
+                        <span class="text-[7px] font-black text-blue-400 uppercase">RSS Feed</span>
+                        <h4 class="text-[10px] font-bold mt-1 uppercase">${item.title}</h4>
+                    </div>`).join('');
+                switchTab('home');
+            } catch(e) { container.innerHTML = "Error al conectar feed."; }
+        }
+
+        function sendChatIA() {
+            const input = document.getElementById('chat-msg');
+            const btn = document.getElementById('chat-send-btn');
+            if(!input.value) return;
+            btn.classList.add('btn-pulse');
+            document.getElementById('chat-content').innerHTML += `<p class="bg-blue-600/20 p-3 rounded-2xl text-right">${input.value}</p>`;
+            input.value = '';
+            setTimeout(() => btn.classList.remove('btn-pulse'), 1000);
+        }
+
+        function addReminder() {
+            const d = document.getElementById('cal-date').value, h = document.getElementById('cal-time').value, t = document.getElementById('cal-text').value;
+            if(d && t) { reminders.unshift({date:d, time:h, text:t, id:Date.now()}); localStorage.setItem('vico_reminders', JSON.stringify(reminders)); renderReminders(); }
+        }
+
+        function renderReminders() {
+            document.getElementById('reminder-list').innerHTML = reminders.map(r => `
+                <div class="glass p-4 rounded-xl border-l-4 border-blue-500 text-[10px] flex justify-between items-center">
+                    <div><b class="text-blue-400">${r.date} ${r.time}</b><br>${r.text}</div>
+                    <button onclick="reminders=reminders.filter(x=>x.id!==r.id);localStorage.setItem('vico_reminders',JSON.stringify(reminders));renderReminders()" class="text-red-500">&times;</button>
+                </div>`).join('');
+        }
+
+        function saveApiKey() { localStorage.setItem('vico_api_key', document.getElementById('api-key-input').value); alert("Sincronizado con éxito."); }
         function renderFolders() {
-            document.getElementById('folder-tabs').innerHTML = folders.map(f => `<div onclick="currentFolder='${f}';renderFolders();renderNotes()" class="folder-chip ${currentFolder===f?'active':''}">${f} <span onclick="delFolder('${f}')" class="ml-1">&times;</span></div>`).join('');
+            document.getElementById('folder-tabs').innerHTML = folders.map(f => `<div onclick="setFolder('${f}')" class="folder-chip ${currentFolder===f?'active':''}">${f}</div>`).join('');
             document.getElementById('folder-target').innerHTML = folders.map(f => `<option value="${f}">${f}</option>`).join('');
         }
-        function delFolder(f) { folders = folders.filter(x => x !== f); localStorage.setItem('vico_folders', JSON.stringify(folders)); renderFolders(); }
-        function createNewFolder() { const n = document.getElementById('new-folder-name').value.trim(); if(n) { folders.push(n); localStorage.setItem('vico_folders', JSON.stringify(folders)); renderFolders(); } }
-
-        function saveNote() {
-            const b = document.getElementById('note-input').value, f = document.getElementById('folder-target').value;
-            if(b) { notes.unshift({body: b, folder: f, id: Date.now()}); localStorage.setItem('vico_notes', JSON.stringify(notes)); renderNotes(); document.getElementById('note-input').value=''; }
-        }
-        function renderNotes() {
-            document.getElementById('notes-grid').innerHTML = notes.filter(n => n.folder === currentFolder).map(n => `<div class="note-card" onclick="this.classList.toggle('expanded')"><div class="note-preview">${n.body}</div><div class="note-full">${n.body}</div></div>`).join('');
-        }
-
-        async function runAnalysisIA() {
-            const key = localStorage.getItem('vico_api_key');
-            if(!key) { alert("Sincroniza API en Ajustes."); return; }
-            document.getElementById('ai-report').classList.remove('hidden');
-            document.getElementById('ai-report').innerText = "Procesando Inteligencia...";
-            // Lógica de Gráficos aquí...
-        }
-
-        function saveApiKey() { localStorage.setItem('vico_api_key', document.getElementById('api-key-input').value); alert("Sincronizado."); }
-        function savePhrase() { /* Lógica Frase */ }
-        function createCustomBtn() { /* Lógica Botón */ }
+        function setFolder(f) { currentFolder = f; renderFolders(); renderNotes(); }
         function switchTab(t) { document.querySelectorAll('main section').forEach(s => s.classList.add('hidden')); document.getElementById(`v-${t}`).classList.remove('hidden'); }
         function toggleElement(id) { const el = document.getElementById(id); el.style.display = (el.style.display==='flex'?'none':'flex'); }
         function openProfile() { document.getElementById('profile-modal').style.display='block'; }
         function closeProfile() { document.getElementById('profile-modal').style.display='none'; }
         function toggleDark() { document.body.classList.toggle('light-mode'); }
-        function renderDashboard() { document.getElementById('top-phrase').innerText = "La mejor forma de predecir el futuro es crearlo. - P. Drucker"; }
     </script>
 </body>
 </html>
